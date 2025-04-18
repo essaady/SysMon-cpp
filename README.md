@@ -12,29 +12,8 @@
 - **Architecture modulaire** : Conçu en utilisant la programmation orientée objet (POO).
 
 ## Structure du Projet
+Coming soon !!
 
-Voici un aperçu de la structure des répertoires du projet :
-
-```plaintext
-SysMon-cpp/
-├── src/                    # Code source principal
-│   ├── CpuMonitor.cpp      # Module de gestion du CPU
-│   ├── MemoryMonitor.cpp   # Module de gestion de la mémoire
-│   ├── ProcessMonitor.cpp  # Module de gestion des processus
-│   └── main.cpp            # Programme principal
-├── include/                # Fichiers d'en-tête
-│   ├── CpuMonitor.h
-│   ├── MemoryMonitor.h
-│   ├── ProcessMonitor.h
-│   └── SysMon.h            # Entête commun
-├── tests/                  # Tests unitaires
-│   └── test_CpuMonitor.cpp
-├── .github/                # Configuration des workflows GitHub Actions pour CI/CD
-│   └── workflows/
-│       └── ci.yml          # Pipeline d'intégration continue
-├── .gitignore              # Ignorer les fichiers temporaires et de compilation
-├── README.md               # Documentation du projet
-└── LICENSE                 # Licence open-source (MIT par défaut)
 ```
 Prérequis
 Dépendances :
