@@ -1,4 +1,4 @@
-# SysMon-cpp
+![SysMon Logo](images/logo.png)# SysMon-cpp
 
 ## Description
 
