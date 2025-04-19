@@ -1,4 +1,7 @@
-# SysMon-cpp
+<div style="display: flex; justify-content: start; align-items: center; gap: 1em;">
+<img src="/image/SysMonCpp.png" alt="logo" width=100 style="border-radius: 50%"/>
+<h1>SysMon-cpp</h1>
+</div>
 
 ## Description
 
