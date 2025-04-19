@@ -1,3 +1,4 @@
+/home/rat/ran_projects/SysMon-cpp/build/CMakeFiles/cpu.dir
 /home/rat/ran_projects/SysMon-cpp/build/CMakeFiles/SysMon.dir
 /home/rat/ran_projects/SysMon-cpp/build/CMakeFiles/edit_cache.dir
 /home/rat/ran_projects/SysMon-cpp/build/CMakeFiles/rebuild_cache.dir
