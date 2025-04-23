@@ -1,4 +1,13 @@
 #include "../include/CpuMonitor.h"
+char* getTime(){
+    time_t timestamp;
+    time(&timestamp);
+    char* time = ctime(&timestamp);
+
+    if(time[strlen(time) - 1] == '\n') time[strlen(time) - 1] = '\0';
+    return time;
+}
+
 
 std::string CpuMon::getCpuInfo()
 {
@@ -10,7 +19,6 @@ std::string CpuMon::getCpuInfo()
         std::cerr << "There was an error opening the file" << std::endl;
         exit(-1);
     }
-    //std::getline(info, content);
     content_stream << info.rdbuf();
     content = content_stream.str();
     return content;
@@ -86,7 +94,14 @@ float CpuMon::calcCpuUsage()
     uint64_t TotalTime = cpu2 - cpu1;
     uint64_t UsedTime = notIdle2 - notIdle1;
 
-    float results = ((float)UsedTime / (float)TotalTime * 100);
-    std::cout << "UsedTime : " << UsedTime << " TotalTime : " << TotalTime << " CpuUsage:  "<< results << "%\n";
+    float results = ((float)UsedTime / (float)TotalTime )* 100;
+    std::cout << "UsedTime : " << UsedTime << " TotalTime : " << TotalTime << " CpuUsage:  \x1b[41m"<< results << "%\n\x1b[0m";
+    std::stringstream out;
+    out << getTime() << "    UsedTime : " << UsedTime << " TotalTime : " << TotalTime << " CpuUsage: "<< results << "%\n\n";
+    {
+        std::fstream logFile("log.txt", std::ios::app);
+        logFile << out.rdbuf();
+        logFile.close();
+    }
     return results;
 }

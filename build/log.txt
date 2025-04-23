@@ -1,0 +1,81 @@
+Wed Apr 23 10:57:31 2025    UsedTime : 43 TotalTime : 1198 CpuUsage: 3.58932%
+
+Wed Apr 23 10:57:32 2025    UsedTime : 62 TotalTime : 1197 CpuUsage: 5.17962%
+
+Wed Apr 23 10:57:33 2025    UsedTime : 13 TotalTime : 1199 CpuUsage: 1.08424%
+
+Wed Apr 23 10:57:34 2025    UsedTime : 8 TotalTime : 1198 CpuUsage: 0.66778%
+
+Wed Apr 23 10:57:35 2025    UsedTime : 27 TotalTime : 1200 CpuUsage: 2.25%
+
+Wed Apr 23 10:57:36 2025    UsedTime : 9 TotalTime : 1195 CpuUsage: 0.753138%
+
+Wed Apr 23 10:57:37 2025    UsedTime : 24 TotalTime : 1199 CpuUsage: 2.00167%
+
+Wed Apr 23 10:57:38 2025    UsedTime : 33 TotalTime : 1205 CpuUsage: 2.73859%
+
+Wed Apr 23 10:57:39 2025    UsedTime : 11 TotalTime : 1196 CpuUsage: 0.919732%
+
+Wed Apr 23 10:57:40 2025    UsedTime : 10 TotalTime : 1199 CpuUsage: 0.834028%
+
+Wed Apr 23 10:57:41 2025    UsedTime : 26 TotalTime : 1195 CpuUsage: 2.17573%
+
+Wed Apr 23 10:57:42 2025    UsedTime : 35 TotalTime : 1200 CpuUsage: 2.91667%
+
+Wed Apr 23 10:57:43 2025    UsedTime : 9 TotalTime : 1194 CpuUsage: 0.753769%
+
+Wed Apr 23 10:57:44 2025    UsedTime : 11 TotalTime : 1197 CpuUsage: 0.918964%
+
+Wed Apr 23 10:57:45 2025    UsedTime : 32 TotalTime : 1204 CpuUsage: 2.65781%
+
+Wed Apr 23 10:57:46 2025    UsedTime : 11 TotalTime : 1194 CpuUsage: 0.921273%
+
+Wed Apr 23 10:57:47 2025    UsedTime : 25 TotalTime : 1192 CpuUsage: 2.09732%
+
+Wed Apr 23 10:57:48 2025    UsedTime : 26 TotalTime : 1196 CpuUsage: 2.17391%
+
+Wed Apr 23 10:57:49 2025    UsedTime : 24 TotalTime : 1197 CpuUsage: 2.00501%
+
+Wed Apr 23 10:57:50 2025    UsedTime : 14 TotalTime : 1200 CpuUsage: 1.16667%
+
+Wed Apr 23 10:57:51 2025    UsedTime : 34 TotalTime : 1199 CpuUsage: 2.8357%
+
+Wed Apr 23 10:57:52 2025    UsedTime : 25 TotalTime : 1195 CpuUsage: 2.09205%
+
+Wed Apr 23 10:57:53 2025    UsedTime : 14 TotalTime : 1196 CpuUsage: 1.17057%
+
+Wed Apr 23 10:57:54 2025    UsedTime : 32 TotalTime : 1203 CpuUsage: 2.66002%
+
+Wed Apr 23 10:57:55 2025    UsedTime : 7 TotalTime : 1195 CpuUsage: 0.585774%
+
+Wed Apr 23 10:57:56 2025    UsedTime : 16 TotalTime : 1198 CpuUsage: 1.33556%
+
+Wed Apr 23 10:57:57 2025    UsedTime : 23 TotalTime : 1197 CpuUsage: 1.92147%
+
+Wed Apr 23 10:57:58 2025    UsedTime : 45 TotalTime : 1198 CpuUsage: 3.75626%
+
+Wed Apr 23 10:57:59 2025    UsedTime : 8 TotalTime : 1196 CpuUsage: 0.668896%
+
+Wed Apr 23 10:58:00 2025    UsedTime : 18 TotalTime : 1193 CpuUsage: 1.5088%
+
+Wed Apr 23 10:58:01 2025    UsedTime : 26 TotalTime : 1193 CpuUsage: 2.17938%
+
+Wed Apr 23 10:58:02 2025    UsedTime : 10 TotalTime : 1196 CpuUsage: 0.83612%
+
+Wed Apr 23 10:58:05 2025    UsedTime : 11 TotalTime : 1197 CpuUsage: 0.918964%
+
+Wed Apr 23 10:58:06 2025    UsedTime : 20 TotalTime : 1200 CpuUsage: 1.66667%
+
+Wed Apr 23 10:58:07 2025    UsedTime : 41 TotalTime : 1199 CpuUsage: 3.41952%
+
+Wed Apr 23 10:58:08 2025    UsedTime : 8 TotalTime : 1196 CpuUsage: 0.668896%
+
+Wed Apr 23 10:58:09 2025    UsedTime : 10 TotalTime : 1200 CpuUsage: 0.833333%
+
+Wed Apr 23 10:58:10 2025    UsedTime : 23 TotalTime : 1194 CpuUsage: 1.9263%
+Wed Apr 23 10:58:14 2025    UsedTime : 13 TotalTime : 1197 CpuUsage: 1.08605%
+
+Wed Apr 23 10:58:15 2025    UsedTime : 14 TotalTime : 1198 CpuUsage: 1.16861%
+
+Wed Apr 23 10:58:16 2025    UsedTime : 36 TotalTime : 1200 CpuUsage: 3%
+

@@ -7,6 +7,8 @@
 #include <sstream>
 #include <vector>
 #include <unistd.h>
+#include <cstdlib>
+#include <cstring>
 
 class CpuMon{
 public:
@@ -15,11 +17,11 @@ public:
     float calcCpuUsage();
     
 private:
-
+    std::vector<std::string> log;
     std::string buffer;
     uint64_t getSnap(std::string calc);
-
-
+    
 };
 
+char* getTime();
 #endif
