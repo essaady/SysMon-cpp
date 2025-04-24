@@ -1,3 +1,6 @@
+<p align="centre">
+    <img src="images/logo.png" alt="SysMon-cpp Logo" width="200"/>
+</p>
 # SysMon-cpp
 
 ## Description
