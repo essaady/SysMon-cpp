@@ -58,6 +58,7 @@ std::string CpuMon::getCpuInfo()
 // }
 
 //Method 2
+//Getting cpu 
 uint64_t CpuMon::getSnap(std::string calc){
 
     uint64_t cpu;
@@ -87,7 +88,7 @@ float CpuMon::calcCpuUsage()
 {
     uint64_t cpu1 = getSnap("NULL");
     uint64_t notIdle1 = getSnap("_USED");
-    usleep(1000000);
+    //usleep(1000000);
     uint64_t cpu2 = getSnap("NULL");
     uint64_t notIdle2 = getSnap("_USED");
 
