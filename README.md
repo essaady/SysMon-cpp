@@ -118,6 +118,45 @@ git commit -am 'Ajout de la fonctionnalité X'
 - Poussez vos changements : git push origin feature/ma-nouvelle-fonctionnalite
 - Ouvrez une pull request pour intégrer vos changements à la branche principale.
 
+
+Chers collegues !
+une proposition de ce qu il faut faire pour les gens qui sont pas encore commence :
+{
+# Tâches à réaliser (Réparties par modules)
+---
+
+### CPU Monitor (`CpuMonitor`)
+-  Ajouter une méthode pour détecter les pics d'utilisation CPU (>80%)
+-  Ajouter un export des données CPU en CSV
+-  Écrire des tests unitaires pour `CpuMonitor`
+
+---
+
+### Memory Monitor (`MemoryMonitor`)
+- Ajouter l'affichage de la mémoire swap
+- Export des stats mémoire dans un fichier `.txt`
+- Écrire des tests pour vérifier la lecture de `/proc/meminfo`
+
+---
+
+### Process Monitor (`ProcessMonitor`)
+- Trier les processus par consommation CPU
+- Ajouter une commande `--limit` pour n’afficher que les N premiers processus
+- Écrire des tests unitaires
+
+---
+
+###  Tests
+- Créer un test global qui vérifie le bon démarrage du programme
+- Ajouter un test d’échec si `/proc/stat` est manquant
+
+---
+- Ajouter plus de documentation aux classes dans les headers `.h`
+Merci à tous !
+
+
+
+
 Bonnes pratiques de développement
 
 -  Ajoutez des tests unitaires pour chaque fonctionnalité que vous implémentez.
