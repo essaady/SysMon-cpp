@@ -11,7 +11,7 @@
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/build/SysMon",
-            "args": ["--update"],
+            "args": ["--export"],
             "stopAtEntry": false,
             "cwd": "${fileDirname}",
             "environment": [],

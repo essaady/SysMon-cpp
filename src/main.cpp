@@ -5,30 +5,14 @@
 int main(int argc, char *argv[])
 {
 
-    // clear the screen after every run
+    // clear the screen on start
+    system("clear");
     std::vector<std::string> options = {"--help", "--update", "--export"};
-    // if (argc >= 2)
-    // {
-    //     for (auto param : options)
-    //     {
-    //         if (!strcmp(argv[1], "--help"))
-    //             std::cout << "--help" << " Called\n";
-
-    //         else if (!strcmp(argv[1], "--update"))
-    //             std::cout << "--update" << " Called\n";
-
-    //         else if (!strcmp(argv[1], "--export"))
-    //             std::cout << "--export" << " Called\n";
-    //         else
-    //         {
-    //             std::cout << argv[1] << " command not reconigzed";
-    //         }
-    //     }
-    // }
-
+    int option = 0;
+    //checking for user argument
     if (argc >= 2)
     {
-
+        bool isReconized = false;
         for (auto param : options)
         {
             char *argument = new char[param.length() + 1];
@@ -36,21 +20,31 @@ int main(int argc, char *argv[])
             if (!strcmp(argv[1], argument))
             {
                 std::cout << param << " Called\n";
+                isReconized = true;
                 break;
             }
-            else
-            {
-                std::cout << "'" << argv[1] << "' command not reconigzed\n";
-                exit(-1);
-            }
+        }
+        if (!isReconized)
+        {
+            std::cout << "'" << argv[1] << "' command not reconigzed\n";
+            exit(-1);
+        }
+
+        if (!strcmp(argv[1], "--export"))
+        {
+            option = options::_NLOG;
         }
     }
 
     CpuMon cpu;
-
-    while(true){
-    cpu.calcCpuUsage();
-    std::cout << "\x1b[2J\x1b[H]";}
+    MemInfo mem;
+    //Calculating and printing both cpu and memory usage
+    while (true)
+    {
+        cpu.calcCpuUsage(option);
+        mem.memUsage(option);
+        std::cout << "\x1b[2J\x1b[H";
+    }
 
     return 0;
 }

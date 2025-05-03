@@ -30,10 +30,12 @@
 *.exe
 *.out
 *.app
-main
 
 # Text files
 *.txt
 
 # Swap files
 *.swp
+
+# Vscode
+.vscode/

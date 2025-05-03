@@ -1,13 +1,18 @@
 [
 {
   "directory": "/home/rat/ran_projects/SysMon-cpp/build",
-  "command": "/usr/bin/clang++ -I/home/rat/ran_projects/SysMon-cpp/include/CpuMonitor.h -I/home/rat/ran_projects/SysMon-cpp/include/MemoryMonitor.h -I/home/rat/ran_projects/SysMon-cpp/./include/SysMon.h -g -std=gnu++20 -o CMakeFiles/cpu.dir/src/CpuMonitor.cpp.o -c /home/rat/ran_projects/SysMon-cpp/src/CpuMonitor.cpp",
+  "command": "/usr/bin/clang++ -I/home/rat/ran_projects/SysMon-cpp/include/CpuMonitor.h -I/home/rat/ran_projects/SysMon-cpp/include/MemoryMonitor.h -I/home/rat/ran_projects/SysMon-cpp/include/SysMon.h -g -std=gnu++20 -o CMakeFiles/cpu.dir/src/CpuMonitor.cpp.o -c /home/rat/ran_projects/SysMon-cpp/src/CpuMonitor.cpp",
   "file": "/home/rat/ran_projects/SysMon-cpp/src/CpuMonitor.cpp"
 },
 {
   "directory": "/home/rat/ran_projects/SysMon-cpp/build",
-  "command": "/usr/bin/clang++ -I/home/rat/ran_projects/SysMon-cpp/include/CpuMonitor.h -I/home/rat/ran_projects/SysMon-cpp/include/MemoryMonitor.h -I/home/rat/ran_projects/SysMon-cpp/./include/SysMon.h -g -std=gnu++20 -o CMakeFiles/cpu.dir/src/MemoryMonitor.cpp.o -c /home/rat/ran_projects/SysMon-cpp/src/MemoryMonitor.cpp",
+  "command": "/usr/bin/clang++ -I/home/rat/ran_projects/SysMon-cpp/include/CpuMonitor.h -I/home/rat/ran_projects/SysMon-cpp/include/MemoryMonitor.h -I/home/rat/ran_projects/SysMon-cpp/include/SysMon.h -g -std=gnu++20 -o CMakeFiles/cpu.dir/src/MemoryMonitor.cpp.o -c /home/rat/ran_projects/SysMon-cpp/src/MemoryMonitor.cpp",
   "file": "/home/rat/ran_projects/SysMon-cpp/src/MemoryMonitor.cpp"
+},
+{
+  "directory": "/home/rat/ran_projects/SysMon-cpp/build",
+  "command": "/usr/bin/clang++ -I/home/rat/ran_projects/SysMon-cpp/include/CpuMonitor.h -I/home/rat/ran_projects/SysMon-cpp/include/MemoryMonitor.h -I/home/rat/ran_projects/SysMon-cpp/include/SysMon.h -g -std=gnu++20 -o CMakeFiles/cpu.dir/src/SysMon.cpp.o -c /home/rat/ran_projects/SysMon-cpp/src/SysMon.cpp",
+  "file": "/home/rat/ran_projects/SysMon-cpp/src/SysMon.cpp"
 },
 {
   "directory": "/home/rat/ran_projects/SysMon-cpp/build",

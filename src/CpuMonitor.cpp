@@ -1,81 +1,29 @@
 #include "../include/CpuMonitor.h"
-char* getTime(){
-    time_t timestamp;
-    time(&timestamp);
-    char* time = ctime(&timestamp);
 
-    if(time[strlen(time) - 1] == '\n') time[strlen(time) - 1] = '\0';
-    return time;
-}
-
-
-std::string CpuMon::getCpuInfo()
+// Getting cpu. snap in snapshot
+uint64_t CpuMon::getSnap(std::string calc)
 {
-    std::string content;
-    std::stringstream content_stream;
-
-    std::fstream info("/proc/stat", std::ios::in);
-    if(!info){
-        std::cerr << "There was an error opening the file" << std::endl;
-        exit(-1);
-    }
-    content_stream << info.rdbuf();
-    content = content_stream.str();
-    return content;
-}
-
-//Methode 1
-// uint64_t CpuMon::getSnap(std::string calc)
-// {
-//     uint64_t cpu = 0;
-//     int counter = 5;
-//     unsigned short space = 0;
-//     std::string cpuInfo = getCpuInfo();
-    
-//     char current_char;
-//     while (current_char != '\n')
-//     {
-//         current_char = cpuInfo[counter];
-//         if (isdigit(current_char))
-//         {
-//             buffer.push_back(current_char);
-//         }
-//         else if (isspace(current_char))
-//         {
-//             space++;
-//             if ((space == 4 || space == 5) && calc == "_USED")
-//             {
-//                 counter++;
-//                 buffer.clear();
-//                 continue;
-//             }
-//             cpu += stoi(buffer);
-//             buffer.clear();
-//         }
-//         counter++;
-//     }
-//     return cpu;
-// }
-
-//Method 2
-//Getting cpu 
-uint64_t CpuMon::getSnap(std::string calc){
 
     uint64_t cpu;
 
-    std::string temp = getCpuInfo();
+    std::string temp = getInfo("/proc/stat");
     std::istringstream iss(temp);
     iss >> temp;
     uint64_t value;
     std::vector<uint64_t> cpuInfo;
-    while(iss >> value){
+    while (iss >> value)
+    {
         cpuInfo.push_back(value);
     }
 
-    if(calc == "_USED"){
+    if (calc == "_USED")
+    {
         cpu = cpuInfo[0] + cpuInfo[1] + cpuInfo[2] + cpuInfo[5] + cpuInfo[6] + cpuInfo[7];
-    }else{
-        for(auto temp : cpuInfo){
+    }
+    else
+    {
+        for (auto temp : cpuInfo)
+        {
             cpu += temp;
         }
     }
@@ -83,26 +31,27 @@ uint64_t CpuMon::getSnap(std::string calc){
     return cpu;
 }
 
-
-float CpuMon::calcCpuUsage()
+float CpuMon::calcCpuUsage(int logger)
 {
     uint64_t cpu1 = getSnap("NULL");
     uint64_t notIdle1 = getSnap("_USED");
-    //usleep(1000000);
+    usleep(1000000);
     uint64_t cpu2 = getSnap("NULL");
     uint64_t notIdle2 = getSnap("_USED");
 
     uint64_t TotalTime = cpu2 - cpu1;
     uint64_t UsedTime = notIdle2 - notIdle1;
 
-    float results = ((float)UsedTime / (float)TotalTime )* 100;
-    std::cout << "UsedTime : " << UsedTime << " TotalTime : " << TotalTime << " CpuUsage:  \x1b[41m"<< results << "%\n\x1b[0m";
+    float results = ((float)UsedTime / (float)TotalTime) * 100;
+    std::cout << "UsedTime : " << UsedTime << " TotalTime : " << TotalTime << " CpuUsage:  \x1b[41m" << results << "%\n\x1b[0m";
     std::stringstream out;
-    out << getTime() << "    UsedTime : " << UsedTime << " TotalTime : " << TotalTime << " CpuUsage: "<< results << "%\n\n";
+
+    //If the user wants to log
+    if (logger == options::_NLOG)
     {
-        std::fstream logFile("log.txt", std::ios::app);
-        logFile << out.rdbuf();
-        logFile.close();
+        out << getTime() << "    UsedTime : " << UsedTime << " TotalTime : " << TotalTime << " CpuUsage: " << results << "%\n";
+
+        log(out);
     }
     return results;
 }

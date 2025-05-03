@@ -2,26 +2,17 @@
 #ifndef _CPU_MON_H
 #define _CPU_MON_H
 
-#include <fstream>
-#include <iostream>
-#include <sstream>
-#include <vector>
-#include <unistd.h>
-#include <cstdlib>
-#include <cstring>
 
-class CpuMon{
+#include "./SysMon.h"
+
+
+class CpuMon : public SysMon{
 public:
     CpuMon(){}
-    std::string getCpuInfo();
-    float calcCpuUsage();
+    float calcCpuUsage(int log);
     
 private:
-    std::vector<std::string> log;
-    std::string buffer;
     uint64_t getSnap(std::string calc);
     
 };
-
-char* getTime();
 #endif

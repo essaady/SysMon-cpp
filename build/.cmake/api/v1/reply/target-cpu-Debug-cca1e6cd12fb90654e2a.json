@@ -61,7 +61,7 @@
 				},
 				{
 					"backtrace" : 2,
-					"path" : "/home/rat/ran_projects/SysMon-cpp/./include/SysMon.h"
+					"path" : "/home/rat/ran_projects/SysMon-cpp/include/SysMon.h"
 				}
 			],
 			"language" : "CXX",
@@ -76,7 +76,8 @@
 			"sourceIndexes" : 
 			[
 				0,
-				1
+				1,
+				2
 			]
 		}
 	],
@@ -95,7 +96,8 @@
 			"sourceIndexes" : 
 			[
 				0,
-				1
+				1,
+				2
 			]
 		}
 	],
@@ -111,6 +113,12 @@
 			"backtrace" : 1,
 			"compileGroupIndex" : 0,
 			"path" : "src/MemoryMonitor.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "src/SysMon.cpp",
 			"sourceGroupIndex" : 0
 		}
 	],
