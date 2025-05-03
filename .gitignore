@@ -37,5 +37,8 @@
 # Swap files
 *.swp
 
+#temporary files
+.tmp
+
 # Vscode
 .vscode/
