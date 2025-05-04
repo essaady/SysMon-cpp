@@ -1,47 +1,32 @@
-# CMake
-CMakeCache.txt
-CMakeFiles/
-cmake_install.cmake
-Makefile
-*.cmake
+# Prerequisites
+*.d
 
-# Build output directories
-build/
-bin/
-lib/
-*.a
-*.so
-*.dylib
-*.dll
-*.exe
-
-# Object files
+# Compiled Object files
+*.slo
+*.lo
 *.o
 *.obj
-*.lo
 
-# Compiled dynamic libraries
+# Precompiled Headers
+*.gch
+*.pch
+
+# Compiled Dynamic libraries
 *.so
 *.dylib
 *.dll
 
-# Temporary files
-*.swp
-*.bak
-*.tmp
+# Fortran module files
+*.mod
+*.smod
 
-# IDEs
-.vscode/
-.idea/
-*.sublime-workspace
-*.sublime-project
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
 
-# OS-generated files
-.DS_Store
-Thumbs.db
-
-# Log files
-*.log
-
-# Backup files
-*.bak
+# Executables
+*.exe
+*.out
+*.app
