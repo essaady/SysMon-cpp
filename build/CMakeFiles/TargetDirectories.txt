@@ -1,0 +1,3 @@
+/home/badie/Desktop/SysMon-cpp/build/CMakeFiles/SysMon-cpp.dir
+/home/badie/Desktop/SysMon-cpp/build/CMakeFiles/edit_cache.dir
+/home/badie/Desktop/SysMon-cpp/build/CMakeFiles/rebuild_cache.dir
