@@ -1,32 +1,47 @@
-# Prerequisites
-*.d
+# CMake
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile
+*.cmake
 
-# Compiled Object files
-*.slo
-*.lo
+# Build output directories
+build/
+bin/
+lib/
+*.a
+*.so
+*.dylib
+*.dll
+*.exe
+
+# Object files
 *.o
 *.obj
+*.lo
 
-# Precompiled Headers
-*.gch
-*.pch
-
-# Compiled Dynamic libraries
+# Compiled dynamic libraries
 *.so
 *.dylib
 *.dll
 
-# Fortran module files
-*.mod
-*.smod
+# Temporary files
+*.swp
+*.bak
+*.tmp
 
-# Compiled Static libraries
-*.lai
-*.la
-*.a
-*.lib
+# IDEs
+.vscode/
+.idea/
+*.sublime-workspace
+*.sublime-project
 
-# Executables
-*.exe
-*.out
-*.app
+# OS-generated files
+.DS_Store
+Thumbs.db
+
+# Log files
+*.log
+
+# Backup files
+*.bak
