@@ -18,6 +18,5 @@ int main() {
                   << std::fixed << std::setprecision(1) << proc.cpu_usage << "%" 
                   << std::endl;
     }
-
     return 0;
 }

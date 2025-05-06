@@ -15,4 +15,4 @@ public:
     static std::vector<ProcessInfo> getTopProcesses(int count = 5);
 };
 
-#endif // PROCESSMONITOR_H
+#endif 

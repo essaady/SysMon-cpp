@@ -9,7 +9,7 @@
 
 namespace {
     bool getProcessInfo(int pid, ProcessInfo& info, long& prev_total_time) {
-        // ... (keep the same implementation as before)
+        
     }
 }
 
