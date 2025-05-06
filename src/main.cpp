@@ -5,6 +5,9 @@ using namespace std;
 
 int main(){
 
+
+    // This is just a simole demo
+
     CpuMonitor::RefreshCpuMonitor();
 
     cout << "CPU :";
@@ -33,7 +36,7 @@ int main(){
     }
     cout << endl;
 
-    cout << "CPU total user time : " << CpuMonitor::CPU[CpuMonitor::States::user] << endl;
+    cout << "Example of CPU total user time : " << CpuMonitor::CPU[CpuMonitor::States::user] << endl;
 
     return 0;
 }

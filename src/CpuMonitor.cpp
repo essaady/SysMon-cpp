@@ -7,6 +7,9 @@
 
 using namespace std;
 
+
+// The explication in the CpuMonitor.h
+
 vector<unsigned long> CpuMonitor::CPU;
 vector<vector<unsigned long>> CpuMonitor::CORES;
 unsigned int CpuMonitor::CORES_NUMBER = 0;
@@ -28,11 +31,11 @@ bool IsNumber(string S){
     return true;
 }
 
-vector <unsigned long> Split(string Line, bool SingleValue){
+vector <unsigned long> CpuMonitor::Split(string Line, bool SingleValue){
     return Split(Line, " ", SingleValue);
 }
 
-vector <unsigned long> Split(string Line, string Delim = " ", bool SingleValue = false){
+vector <unsigned long> CpuMonitor::Split(string Line, string Delim = " ", bool SingleValue = false){
     vector<unsigned long> Values;
     short pos = 0;
     string sWord; 
@@ -61,47 +64,53 @@ void CpuMonitor::RefreshCpuMonitor(){
 }
 
 void CpuMonitor::ReadStatFile(){
-    ifstream file("/proc/stat");
-
-    if(!file.is_open()){
-        cerr << "An error occurred while opening /proc/stat" << endl;
-        return;
-    }
-    string line;
     
-    getline(file, line);
-    CPU = Split(line);
+    try{
+        ifstream file("/proc/stat");
 
-    int i = 0;
-    while(getline(file, line)){
-        if(line.substr(0, 3) == "cpu"){
-            CORES.push_back(Split(line));
-            i++;
-        }else{
-            break;
+        if(!file.is_open()){
+            cerr << "An error occurred while opening /proc/stat" << endl;
+            return;
         }
+        string line;
+        
+        getline(file, line);
+        CPU = Split(line);
+
+        int i = 0;
+        while(getline(file, line)){
+            if(line.substr(0, 3) == "cpu"){
+                CORES.push_back(Split(line));
+                i++;
+            }else{
+                break;
+            }
+        }
+        CORES_NUMBER = i;
+        
+        INTERRUPTS = Split(line, true)[0];
+
+        getline(file, line);
+        CONTEXT_SWITCHES = Split(line)[0];
+
+        getline(file, line);
+        BOOT_TIME = Split(line)[0];
+        
+        getline(file, line);
+        PROCESSES = Split(line)[0];
+        
+        getline(file, line);
+        PROCESSES_RUNNING = Split(line)[0];
+        
+        getline(file, line);
+        PROCESSES_BLOCKED = Split(line)[0];
+        
+        getline(file, line);
+        SOFT_IRQS = Split(line);
+    }catch(const exception& e){
+        cerr << "Error : " << e.what() << endl;
     }
-    CORES_NUMBER = i;
     
-    INTERRUPTS = Split(line, true)[0];
-
-    getline(file, line);
-    CONTEXT_SWITCHES = Split(line)[0];
-
-    getline(file, line);
-    BOOT_TIME = Split(line)[0];
-    
-    getline(file, line);
-    PROCESSES = Split(line)[0];
-    
-    getline(file, line);
-    PROCESSES_RUNNING = Split(line)[0];
-    
-    getline(file, line);
-    PROCESSES_BLOCKED = Split(line)[0];
-    
-    getline(file, line);
-    SOFT_IRQS = Split(line);
 
 }
 
