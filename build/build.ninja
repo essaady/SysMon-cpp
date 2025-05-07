@@ -52,21 +52,28 @@ build cmake_object_order_depends_target_cpu: phony || CMakeFiles/cpu.dir
 build CMakeFiles/cpu.dir/src/CpuMonitor.cpp.o: CXX_COMPILER__cpu_Debug /home/rat/ran_projects/SysMon-cpp/src/CpuMonitor.cpp || cmake_object_order_depends_target_cpu
   DEP_FILE = CMakeFiles/cpu.dir/src/CpuMonitor.cpp.o.d
   FLAGS = -g -std=gnu++20
-  INCLUDES = -I/home/rat/ran_projects/SysMon-cpp/include/CpuMonitor.h -I/home/rat/ran_projects/SysMon-cpp/include/MemoryMonitor.h -I/home/rat/ran_projects/SysMon-cpp/include/SysMon.h
+  INCLUDES = -I/home/rat/ran_projects/SysMon-cpp/./include
   OBJECT_DIR = CMakeFiles/cpu.dir
   OBJECT_FILE_DIR = CMakeFiles/cpu.dir/src
 
 build CMakeFiles/cpu.dir/src/MemoryMonitor.cpp.o: CXX_COMPILER__cpu_Debug /home/rat/ran_projects/SysMon-cpp/src/MemoryMonitor.cpp || cmake_object_order_depends_target_cpu
   DEP_FILE = CMakeFiles/cpu.dir/src/MemoryMonitor.cpp.o.d
   FLAGS = -g -std=gnu++20
-  INCLUDES = -I/home/rat/ran_projects/SysMon-cpp/include/CpuMonitor.h -I/home/rat/ran_projects/SysMon-cpp/include/MemoryMonitor.h -I/home/rat/ran_projects/SysMon-cpp/include/SysMon.h
+  INCLUDES = -I/home/rat/ran_projects/SysMon-cpp/./include
   OBJECT_DIR = CMakeFiles/cpu.dir
   OBJECT_FILE_DIR = CMakeFiles/cpu.dir/src
 
 build CMakeFiles/cpu.dir/src/SysMon.cpp.o: CXX_COMPILER__cpu_Debug /home/rat/ran_projects/SysMon-cpp/src/SysMon.cpp || cmake_object_order_depends_target_cpu
   DEP_FILE = CMakeFiles/cpu.dir/src/SysMon.cpp.o.d
   FLAGS = -g -std=gnu++20
-  INCLUDES = -I/home/rat/ran_projects/SysMon-cpp/include/CpuMonitor.h -I/home/rat/ran_projects/SysMon-cpp/include/MemoryMonitor.h -I/home/rat/ran_projects/SysMon-cpp/include/SysMon.h
+  INCLUDES = -I/home/rat/ran_projects/SysMon-cpp/./include
+  OBJECT_DIR = CMakeFiles/cpu.dir
+  OBJECT_FILE_DIR = CMakeFiles/cpu.dir/src
+
+build CMakeFiles/cpu.dir/src/ProcessMonitor.cpp.o: CXX_COMPILER__cpu_Debug /home/rat/ran_projects/SysMon-cpp/src/ProcessMonitor.cpp || cmake_object_order_depends_target_cpu
+  DEP_FILE = CMakeFiles/cpu.dir/src/ProcessMonitor.cpp.o.d
+  FLAGS = -g -std=gnu++20
+  INCLUDES = -I/home/rat/ran_projects/SysMon-cpp/./include
   OBJECT_DIR = CMakeFiles/cpu.dir
   OBJECT_FILE_DIR = CMakeFiles/cpu.dir/src
 
@@ -78,7 +85,7 @@ build CMakeFiles/cpu.dir/src/SysMon.cpp.o: CXX_COMPILER__cpu_Debug /home/rat/ran
 #############################################
 # Link the static library libcpu.a
 
-build libcpu.a: CXX_STATIC_LIBRARY_LINKER__cpu_Debug CMakeFiles/cpu.dir/src/CpuMonitor.cpp.o CMakeFiles/cpu.dir/src/MemoryMonitor.cpp.o CMakeFiles/cpu.dir/src/SysMon.cpp.o
+build libcpu.a: CXX_STATIC_LIBRARY_LINKER__cpu_Debug CMakeFiles/cpu.dir/src/CpuMonitor.cpp.o CMakeFiles/cpu.dir/src/MemoryMonitor.cpp.o CMakeFiles/cpu.dir/src/SysMon.cpp.o CMakeFiles/cpu.dir/src/ProcessMonitor.cpp.o
   LANGUAGE_COMPILE_FLAGS = -g
   OBJECT_DIR = CMakeFiles/cpu.dir
   POST_BUILD = :
