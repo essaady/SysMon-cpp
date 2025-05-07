@@ -39,8 +39,6 @@ vector <unsigned long> CpuMonitor::Split(string Line, string Delim = " ", bool S
     vector<unsigned long> Values;
     short pos = 0;
     string sWord; 
-    bool isWord = true;
-    int i = 2;
     while ((pos = Line.find(Delim)) != std::string::npos){
         sWord = Line.substr(0, pos);
         if(IsNumber(sWord) && sWord != ""){
