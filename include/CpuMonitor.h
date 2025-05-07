@@ -15,7 +15,7 @@ using namespace std;
 /*
 First of all you have to understand the structure of /proc/stat file.
 
-All what I have done is to collect the infornations from the file 
+All what I have done is to collect the information from the file 
 and store them in variables, so we can display them or calculate
 other values that depends on them.
 

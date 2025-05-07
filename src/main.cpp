@@ -6,7 +6,7 @@ using namespace std;
 int main(){
 
 
-    // This is just a simole demo
+    // This is just a simple demo
 
     CpuMonitor::RefreshCpuMonitor();
 
