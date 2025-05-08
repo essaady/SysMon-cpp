@@ -1,0 +1,23 @@
+name: Tests CSV
+
+on:
+  push:
+    branches:
+      - main
+      - feature/csv-integration
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Cloner le dépôt
+        uses: actions/checkout@v3
+
+      - name: Installer Python et dépendances
+        run: |
+          python -m venv venv
+          source venv/bin/activate
+          pip install -r requirements.txt
+
+      - name: Exécuter le script CSV
+        run: python src/csv_handler.py
