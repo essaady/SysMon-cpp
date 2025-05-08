@@ -11,6 +11,9 @@ int main() {
     ProcessMonitor processMonitor;
     
     cout << "==============Welcome to SYSMON-CPP !!!==============" << endl;
+    // Print CPU infos
+    cout << "CPU Model: " << cpuMonitor.getCpuModelName() << endl;
+    cout << "Number of Cores: " << cpuMonitor.getCoreCount() << endl;
     
     return 0;
 }
