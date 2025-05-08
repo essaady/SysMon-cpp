@@ -1,0 +1,6 @@
+class CpuMonitor {
+public:
+
+private:
+
+};
