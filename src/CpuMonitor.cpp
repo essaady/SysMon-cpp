@@ -35,7 +35,7 @@ float CpuMon::calcCpuUsage(int logger)
 {
     uint64_t cpu1 = getSnap("NULL");
     uint64_t notIdle1 = getSnap("_USED");
-    usleep(1000000);
+    usleep(500000);
     uint64_t cpu2 = getSnap("NULL");
     uint64_t notIdle2 = getSnap("_USED");
 
@@ -44,11 +44,12 @@ float CpuMon::calcCpuUsage(int logger)
 
     float results = ((float)UsedTime / (float)TotalTime) * 100;
     std::cout << "UsedTime : " << UsedTime << " TotalTime : " << TotalTime << " CpuUsage:  \x1b[41m" << results << "%\n\x1b[0m";
-    std::stringstream out;
+    
 
     //If the user wants to log
     if (logger == options::_NLOG)
     {
+        std::stringstream out;
         out << getTime() << "    UsedTime : " << UsedTime << " TotalTime : " << TotalTime << " CpuUsage: " << results << "%\n";
 
         log(out);

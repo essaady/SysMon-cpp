@@ -61,7 +61,9 @@
         "semaphore": "cpp",
         "stop_token": "cpp",
         "thread": "cpp",
-        "cinttypes": "cpp"
+        "cinttypes": "cpp",
+        "codecvt": "cpp",
+        "iomanip": "cpp"
     },
     "github.copilot.enable": {
         "*": false,

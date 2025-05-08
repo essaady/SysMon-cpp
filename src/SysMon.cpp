@@ -22,10 +22,11 @@ std::string SysMon::getInfo(std::string _file_path)
     if (!info)
     {
         std::cerr << "There was an error opening the file" << std::endl;
-        exit(-1);
+        return " ";
     }
     content_stream << info.rdbuf();
     content = content_stream.str();
+    info.close();
     return content;
 }
 

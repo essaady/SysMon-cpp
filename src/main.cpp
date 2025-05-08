@@ -1,6 +1,9 @@
 #include <iostream>
 #include "../include/MemoryMonitor.h"
 #include "../include/CpuMonitor.h"
+#include "../include/ProcessMonitor.h"
+
+
 
 int main(int argc, char *argv[])
 {
@@ -9,7 +12,7 @@ int main(int argc, char *argv[])
     system("clear");
     std::vector<std::string> options = {"--help", "--update", "--export"};
     int option = 0;
-    //checking for user argument
+    // checking for user argument
     if (argc >= 2)
     {
         bool isReconized = false;
@@ -38,13 +41,20 @@ int main(int argc, char *argv[])
 
     CpuMon cpu;
     MemInfo mem;
-    //Calculating and printing both cpu and memory usage
-    while (true)
+    ProcMon process;
+    // Calculating and printing both cpu and memory usage
+    int i = 0;
+    while (i < 10)
     {
+        usleep(1000000);
+
+        system("clear");
         cpu.calcCpuUsage(option);
         mem.memUsage(option);
-        std::cout << "\x1b[2J\x1b[H";
+        process.getProcess();
+        i++;
     }
 
+    
     return 0;
 }
