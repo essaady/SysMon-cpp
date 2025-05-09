@@ -1,12 +1,11 @@
 #include "utils/FileUtils.h"
 #include <iostream>
 #include <fstream>
-#include <vector> 
+#include <vector>
 
-using namespace std;
 
 void createTestFile() {
-    ofstream out("test.txt");
+    std::ofstream out("test.txt");
     out << "Bonjour\n";
     out << "Ceci est un test\n";
     out << "Fin de fichier\n";
@@ -15,17 +14,17 @@ void createTestFile() {
 int main() {
     createTestFile();
     
-        std::cout << "Démarrage du programme !" << std::endl;
+    std::cout << "Démarrage du programme !" << std::endl;
 
     try {
-        vector<string> lignes = FileUtils::readFileLines("test.txt");
-        cout << "Contenu lu depuis test.txt :" << endl;
+        std::vector<std::string> lignes = FileUtils::readFileLines("test.txt");
+        std::cout << "Contenu lu depuis test.txt :" << std::endl;
 
         for (const auto& ligne : lignes) {
-            cout << ligne << endl;
+            std::cout << ligne << std::endl;
         }
-    } catch (const exception& e) {
-        cerr << "Erreur : " << e.what() << endl;
+    } catch (const std::exception& e) {
+        std::cerr << "Erreur : " << e.what() << std::endl;
     }
 
     return 0;
