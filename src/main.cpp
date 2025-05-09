@@ -1,7 +1,7 @@
 #include "SysMon.h"
 #include "ProcessMonitor.h"
 #include <iostream>
-
+#include "CpuMonitor.h"
 int main() {
     auto topProcesses = ProcessMonitor::getTopProcesses(5);
     
@@ -18,6 +18,10 @@ int main() {
                 << std::fixed << std::setprecision(1) << proc.cpu_usage << "%" 
                 << std::endl;
     }
+
+    CpuMonitor cpuMonitor;
+    double usage = cpuMonitor.getUsage();
+    std::cout << "Utilisation du CPU : " << usage << "%" << std::endl;
 
     return 0;
 }
