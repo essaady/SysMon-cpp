@@ -1,30 +1,27 @@
-#include "utils/FileUtils.h"
-#include <iostream>
+#include "FileUtils.h"
 #include <fstream>
-#include <vector>
+#include <stdexcept>
 
-void createTestFile() {
-    std::ofstream out("test.txt");
-    out << "Bonjour\n";
-    out << "Ceci est un test\n";
-    out << "Fin de fichier\n";
-}
+namespace FileUtils {
 
-int main() {
-    createTestFile();
+std::vector<std::string> readFileLines(const std::string& path) {
+    std::vector<std::string> lines;
+    std::ifstream file(path);
     
-    std::cout << "Démarrage du programme !" << std::endl;
-
-    try {
-        std::vector<std::string> lignes = FileUtils::readFileLines("test.txt");
-        std::cout << "Contenu lu depuis test.txt :" << std::endl;
-
-        for (const auto& ligne : lignes) {
-            std::cout << ligne << std::endl;
-        }
-    } catch (const std::exception& e) {
-        std::cerr << "Erreur : " << e.what() << std::endl;
+    if (!file.is_open()) {
+        throw std::runtime_error("Failed to open file: " + path + " (file may not exist or permissions denied)");
+    }
+    
+    if (file.peek() == std::ifstream::traits_type::eof()) {
+        throw std::runtime_error("File is empty: " + path);
     }
 
-    return 0;
+    std::string line;
+    while (std::getline(file, line)) {
+        lines.push_back(line);
+    }
+    
+    return lines;
 }
+
+} // namespace FileUtils
