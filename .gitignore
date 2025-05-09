@@ -30,3 +30,15 @@
 *.exe
 *.out
 *.app
+
+# Text files
+*.txt
+
+# Swap files
+*.swp
+
+#temporary files
+.tmp
+
+# Vscode
+.vscode/
