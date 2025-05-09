@@ -19,9 +19,6 @@ int main() {
                 << std::endl;
     }
 
-    CpuMonitor cpuMonitor;
-    double usage = cpuMonitor.getUsage();
-    std::cout << "Utilisation du CPU : " << usage << "%" << std::endl;
 
     return 0;
 }
