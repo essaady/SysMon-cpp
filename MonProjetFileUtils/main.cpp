@@ -1,30 +1,26 @@
-#include "utils/FileUtils.h"
 #include <iostream>
-#include <fstream>
-#include <vector>
-
-
-void createTestFile() {
-    std::ofstream out("test.txt");
-    out << "Bonjour\n";
-    out << "Ceci est un test\n";
-    out << "Fin de fichier\n";
-}
+#include "FileUtils.h"
 
 int main() {
-    createTestFile();
-    
-    std::cout << "Démarrage du programme !" << std::endl;
+    const std::string path = "test.txt";
 
     try {
-        std::vector<std::string> lignes = FileUtils::readFileLines("test.txt");
-        std::cout << "Contenu lu depuis test.txt :" << std::endl;
+        std::vector<std::string> lines = FileUtils::readFileLines(path);
 
-        for (const auto& ligne : lignes) {
-            std::cout << ligne << std::endl;
+        std::cout << "File content:\n";
+        for (const std::string& line : lines) {
+            std::cout << line << '\n';
         }
-    } catch (const std::exception& e) {
-        std::cerr << "Erreur : " << e.what() << std::endl;
+
+        // Optional cleanup after test
+        if (std::remove(path.c_str()) == 0) {
+            std::cout << "Test file '" << path << "' deleted successfully.\n";
+        } else {
+            std::cerr << "Warning: Could not delete test file '" << path << "'.\n";
+        }
+
+    } catch (const std::exception& ex) {
+        std::cerr << "Error: " << ex.what() << '\n';
     }
 
     return 0;
