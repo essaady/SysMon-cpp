@@ -1,8 +1,8 @@
-#include "ProcessMonitor.h"
 #include <iostream>
-using namespace std;
+#include "CpuMonitor.h"
+
 int main() {
-    ProcessMonit monitor;
-    monitor.displayProcesses();
+    CpuMonitor monitor;
+    std::cout << "CPU usage: " << monitor.getUsage() << "%" << std::endl;
     return 0;
 }
