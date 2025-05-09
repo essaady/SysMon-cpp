@@ -28,13 +28,11 @@ int main() {
     std::cout << "Starting Memory Monitor..." << std::endl;
 
     // Simulate some memory usage
-    int* arr = new int[1000000]; // ~4MB
+    int* arr = new int[1000000]; 
     for (int i = 0; i < 1000000; ++i) arr[i] = i;
 
     printMemoryUsage();
-
     delete[] arr;
-
     return 0;
 }
 
