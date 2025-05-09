@@ -59,10 +59,7 @@ cd SysMon-cpp
 
 Le projet utilise CMake pour la gestion de la compilation. Vous pouvez le compiler en utilisant les commandes suivantes :
 ```
-mkdir build
-cd build
-cmake ..
-make
+g++ -I include src/main.cpp  src/CpuMonitor.cpp  src/MemoryMonitor.cpp  src/ProcessMonitor.cpp -o output/sysmon
 ```
 
 3. Exécuter le Moniteur Système
@@ -70,7 +67,7 @@ make
 Une fois le projet compilé, vous pouvez exécuter le moniteur système avec la commande suivante :
 
 ```
-./SysMon-cpp
+ .\output\sysmon
 ```
 
 Utilisation
