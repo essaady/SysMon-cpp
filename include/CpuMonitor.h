@@ -4,11 +4,15 @@
 class CpuMonitor {
 public:
     CpuMonitor();
+    int getPhysicalCoreCount();
+    int getLogicalProcessorCount();
     std::string getCpuModelName();
-    int getCoreCount();
     double getCpuUsagePercent();
+    double getUptime(); // Returns system uptime in seconds
+
 private:
-    int coreCount_;
+    int physicalCores_;
+    int logicalProcessors_;
     std::string modelName_;
 
     // For CPU usage calculation

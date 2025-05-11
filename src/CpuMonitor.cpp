@@ -1,12 +1,27 @@
 #include "../include/CpuMonitor.h"
 #include <windows.h>
 #include <intrin.h>
+#include <memory>
 
 CpuMonitor::CpuMonitor() : lastTotalTime_(0), lastIdleTime_(0) {
-    // Get CPU core count
+    // Get logical processor count
     SYSTEM_INFO sysInfo;
     GetSystemInfo(&sysInfo);
-    coreCount_ = sysInfo.dwNumberOfProcessors;
+    logicalProcessors_ = sysInfo.dwNumberOfProcessors;
+
+    // Get physical core count
+    DWORD length = 0;
+    GetLogicalProcessorInformation(nullptr, &length);
+    auto buffer = std::make_unique<BYTE[]>(length);
+    auto ptr = reinterpret_cast<PSYSTEM_LOGICAL_PROCESSOR_INFORMATION>(buffer.get());
+    GetLogicalProcessorInformation(ptr, &length);
+
+    physicalCores_ = 0;
+    for (DWORD i = 0; i < length / sizeof(SYSTEM_LOGICAL_PROCESSOR_INFORMATION); i++) {
+        if (ptr[i].Relationship == RelationProcessorCore) {
+            physicalCores_++;
+        }
+    }
 
     // Get CPU model name using CPUID
     char brand[49] = {0};
@@ -22,8 +37,12 @@ CpuMonitor::CpuMonitor() : lastTotalTime_(0), lastIdleTime_(0) {
     modelName_ = brand;
 }
 
-int CpuMonitor::getCoreCount() {
-    return coreCount_;
+int CpuMonitor::getPhysicalCoreCount() {
+    return physicalCores_;
+}
+
+int CpuMonitor::getLogicalProcessorCount() {
+    return logicalProcessors_;
 }
 
 std::string CpuMonitor::getCpuModelName() {
@@ -67,4 +86,8 @@ double CpuMonitor::getCpuUsagePercent() {
     
     double usagePercent = (1.0 - (double)idleTimeDiff / totalTimeDiff) * 100.0;
     return (usagePercent < 0.0) ? 0.0 : (usagePercent > 100.0) ? 100.0 : usagePercent;
+}
+
+double CpuMonitor::getUptime() {
+    return GetTickCount64() / 1000.0; // Convert milliseconds to seconds
 }
