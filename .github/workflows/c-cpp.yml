@@ -1,0 +1,33 @@
+name: C/C++ CI
+
+on:
+  push:
+    paths:
+      - '**/*.cpp'
+      - '**/*.h'
+      - '**/*.hpp'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install g++
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y g++
+
+      - name: Debug PATH and compilers
+        run: |
+          which g++
+          g++ --version || echo "g++ not found"
+          
+      - name: Syntax check
+        run: |
+          for file in $(find . -type f \( -name "*.cpp" -o -name "*.h" -o -name "*.hpp" \)); do
+            echo "Checking syntax: $file"
+            g++ -fsyntax-only "$file"
+          done
