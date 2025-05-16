@@ -3,9 +3,9 @@
 #include <string>
 
 
-void afficherEnTete(const std::string& titre) {
+void afficherEnTete(const std::string& Titre) {
     std::cout << "\n";
-    std::cout << "======================= " << titre << " ====================\n";
+    std::cout << "======================= " << Titre << " ====================\n";
 }
 
 
