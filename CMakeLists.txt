@@ -1,13 +1,12 @@
-cmake_minimum_required( VERSION 3.22 )
 
-project( Systeme_Monitor )
+cmake_minimum_required(VERSION 3.10)
+project(SysMon-cpp)
 
-set( CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD 11)
 
-add_library(cpu STATIC src/CpuMonitor.cpp src/MemoryMonitor.cpp src/SysMon.cpp src/ProcessMonitor.cpp)
-target_include_directories(cpu PRIVATE ./include)
+include_directories(include)
 
+file(GLOB SOURCES "src/*.cpp")
 
-add_executable(SysMon ./src/main.cpp)
-target_link_libraries(SysMon PUBLIC cpu)
+add_executable(SysMon-cpp ${SOURCES})
 
