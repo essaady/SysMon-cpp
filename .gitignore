@@ -35,7 +35,6 @@ lib/
 .idea/
 *.sublime-workspace
 *.sublime-project
-
 # OS-generated files
 .DS_Store
 Thumbs.db
@@ -45,3 +44,14 @@ Thumbs.db
 
 # Backup files
 *.bak
+# Executables
+*.exe
+*.out
+*.app
+
+# Text files
+*.txt
+
+# Swap files
+*.swp
+

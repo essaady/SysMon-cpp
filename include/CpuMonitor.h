@@ -1,3 +1,4 @@
+
 #ifndef CPU_MONITOR_H
 #define CPU_MONITOR_H
 
@@ -85,3 +86,4 @@ private:
 };
 
 #endif // CPU_MONITOR_H
+

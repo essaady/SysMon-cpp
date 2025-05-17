@@ -1,4 +1,5 @@
 #include "../include/CpuMonitor.h"
+
 #include <fstream>
 #include <sstream>
 #include <iostream>

@@ -1,4 +1,5 @@
 #include "../include/MemoryMonitor.h"
+
 #include <fstream>
 #include <sstream>
 #include <iostream>
@@ -164,3 +165,4 @@ bool MemoryMonitor::readMemInfo() {
     memFile.close();
     return true;
 }
+

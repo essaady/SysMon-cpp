@@ -1,4 +1,5 @@
 #include "../include/SysMon.h"
+
 #include <iostream>
 #include <fstream>
 #include <thread>
@@ -146,3 +147,4 @@ void SysMon::monitorLoop() {
         std::this_thread::sleep_for(std::chrono::milliseconds(updateInterval));
     }
 }
+
