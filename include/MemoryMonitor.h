@@ -2,6 +2,7 @@
 #include <fstream>
 #include <string>
 #include <sstream>
+//Hamza Tahiri
 
 void afficherUtilisationMemoire() {
     std::ifstream fichier("/proc/meminfo");
