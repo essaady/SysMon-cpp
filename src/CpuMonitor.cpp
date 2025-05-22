@@ -14,4 +14,5 @@ double CpuMonitor::getCpuUsage() {
 // Destructeur
 CpuMonitor::~CpuMonitor() {
     // Libération des ressources si nécessaire
+
 }
