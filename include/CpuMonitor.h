@@ -1,18 +1,20 @@
-#pragma once
-#ifndef _CPU_MON_H
-#define _CPU_MON_H
+#ifndef CPUMONITOR_H
+#define CPUMONITOR_H
 
-
-#include "./SysMon.h"
-
-
-class CpuMon : public SysMon{
+class CpuMonitor {
 public:
-    CpuMon(){}
-    float calcCpuUsage(int log);
+    // Constructeur
+    CpuMonitor();
     
+    // Méthode pour récupérer l'utilisation du CPU
+    double getCpuUsage();
+    
+    // Destructeur
+    ~CpuMonitor();
+
 private:
-    uint64_t getSnap(std::string calc);
-    
+    // Vous pourrez ajouter des variables privées ici plus tard pour stocker l'état du CPU
 };
-#endif
+
+#endif // CPUMONITOR_H
+
