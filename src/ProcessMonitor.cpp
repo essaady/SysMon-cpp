@@ -1,4 +1,5 @@
 #include "../include/ProcessMonitor.h"
+
 #include <windows.h>
 #include <psapi.h>
 #include <tlhelp32.h>
@@ -217,4 +218,5 @@ std::vector<ProcessInfo> ProcessMonitor::getTopProcesses(int count) const {
     
     result.assign(processes.begin(), processes.begin() + actualCount);
     return result;
+
 }
