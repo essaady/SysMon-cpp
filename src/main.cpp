@@ -1,20 +1,25 @@
 #include <iostream>
-#include "../include/MemoryMonitor.h"
-using namespace std;
+#include <unistd.h>  
+#include "ProcessMonitor.h"
+using namespace std ;
 
 int main() {
-    
-MemoryMonitor monitor;
-    cout << "SysMon-cpp -Moniteur de memoire" << endl;
+    ProcessMonitor procMon;  
 
-if (!monitor.update()) {
-    cout << "Mise a jour:" << endl;
+    while (true) {  
+        
+    // top 3
+        auto topProcesses = procMon.getTopMemoryProcesses(3);
 
-return 1;
-}
-monitor.display();
-    cout << "Erreur " <<endl;
+        // Affiche les résultats
+        cout << "Top 3 (RAM):\n";
+        for (const auto& proc : topProcesses) {
+            cout << "PID " << proc.pid << " | "
+                      << proc.name << " | "
+                      << proc.memory_usage << " KB\n";
+        }
 
-return 0;
-
+        sleep(2);  // 2 sec 
+    }
+    return 0;
 }
