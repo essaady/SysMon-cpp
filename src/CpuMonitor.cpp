@@ -1,4 +1,4 @@
-#include "../include/CpuMonitor.h"
+#include "CpuMonitor.h"
 #include <iostream>
 #include <fstream>
 #include <sstream>
