@@ -1,95 +1,125 @@
-#include <iostream>
-#include <fstream>
-#include <sstream>
+#ifndef PROCESS_MONITOR_H
+#define PROCESS_MONITOR_H
+
 #include <string>
 #include <vector>
-#include <dirent.h>
-#include <unistd.h>
-#include <algorithm>
-#include <iomanip>
+#include <map>
 
+/**
+ * @class ProcessInfo
+ * @brief Structure contenant les informations d'un processus
+ */
 struct ProcessInfo {
     int pid;
-    std::string command;
+    std::string name;
+    std::string user;
+    std::string state;
     double cpuUsage;
+    double memoryUsage;
+    unsigned long long rss;
+    unsigned long long vsz;
+    unsigned int priority;
+    unsigned int nice;
+    unsigned long long startTime;
+    unsigned int threads;
 };
 
-long getUptime() {
-    std::ifstream file("/proc/uptime");
-    double uptime = 0.0;
-    if (file.is_open()) {
-        file >> uptime;
-        file.close();
-    }
-    return static_cast<long>(uptime);
-}
+/**
+ * @class ProcessMonitor
+ * @brief Classe pour surveiller les processus actifs
+ */
+class ProcessMonitor {
+public:
+    /**
+     * @brief Constructeur
+     */
+    ProcessMonitor();
 
-std::vector<ProcessInfo> getProcessesCPUUsage() {
+    /**
+     * @brief Destructeur
+     */
+    ~ProcessMonitor();
+
+    /**
+     * @brief Met à jour la liste des processus
+     * @return true si la mise à jour a réussi, false sinon
+     */
+    bool update();
+
+    /**
+     * @brief Obtient la liste des processus
+     * @return Vecteur de ProcessInfo
+     */
+    std::vector<ProcessInfo> getProcesses() const;
+
+    /**
+     * @brief Obtient les N processus les plus consommateurs de CPU
+     * @param n Nombre de processus à retourner
+     * @return Vecteur de ProcessInfo
+     */
+    std::vector<ProcessInfo> getTopCPUProcesses(int n) const;
+
+    /**
+     * @brief Obtient les N processus les plus consommateurs de mémoire
+     * @param n Nombre de processus à retourner
+     * @return Vecteur de ProcessInfo
+     */
+    std::vector<ProcessInfo> getTopMemoryProcesses(int n) const;
+
+    /**
+     * @brief Obtient les informations d'un processus spécifique
+     * @param pid ID du processus
+     * @return ProcessInfo du processus demandé
+     */
+    ProcessInfo getProcessInfo(int pid) const;
+
+    /**
+     * @brief Exporte les données au format texte
+     * @param limit Nombre maximum de processus à inclure (0 pour tous)
+     * @return Chaîne formatée des données processus
+     */
+    std::string exportAsText(int limit = 0) const;
+
+    /**
+     * @brief Exporte les données au format CSV
+     * @param limit Nombre maximum de processus à inclure (0 pour tous)
+     * @return Chaîne CSV des données processus
+     */
+    std::string exportAsCSV(int limit = 0) const;
+
+private:
     std::vector<ProcessInfo> processes;
-    DIR* dir = opendir("/proc");
-    struct dirent* entry;
-    long uptime = getUptime();
-    long clk_tck = sysconf(_SC_CLK_TCK);
+    std::map<int, unsigned long long> prevCpuTimes;
+    unsigned long long systemUptime;
+    unsigned long long hertz;
 
-    while ((entry = readdir(dir)) != nullptr) {
-        if (isdigit(entry->d_name[0])) {
-            int pid = atoi(entry->d_name);
-            std::string statPath = "/proc/" + std::string(entry->d_name) + "/stat";
-            std::ifstream statFile(statPath);
-            if (statFile.is_open()) {
-                std::string line;
-                std::getline(statFile, line);
-                statFile.close();
+    /**
+     * @brief Lit les informations d'un processus
+     * @param pid ID du processus
+     * @return ProcessInfo du processus
+     */
+    ProcessInfo readProcessInfo(int pid);
 
-                std::istringstream iss(line);
-                std::string comm;
-                char c;
-                std::string dummy;
-                long utime, stime, cutime, cstime, starttime;
+    /**
+     * @brief Obtient le nom d'utilisateur à partir de l'UID
+     * @param uid UID de l'utilisateur
+     * @return Nom d'utilisateur
+     */
+    std::string getUsernameFromUid(uid_t uid) const;
 
-                iss >> pid >> comm;
-                // Supprimer les parenthèses autour de la commande
-                if (comm.front() == '(' && comm.back() == ')')
-                    comm = comm.substr(1, comm.size() - 2);
+    /**
+     * @brief Lit l'uptime du système
+     * @return Uptime en secondes
+     */
+    unsigned long long readSystemUptime() const;
 
-                // Avancer jusqu'au champ 14
-                for (int i = 3; i <= 13; ++i) iss >> dummy;
-                iss >> utime >> stime >> cutime >> cstime;
+    /**
+     * @brief Calcule l'utilisation CPU d'un processus
+     * @param pid ID du processus
+     * @param currentTime Temps CPU actuel
+     * @return Pourcentage d'utilisation CPU
+     */
+    double calculateProcessCpuUsage(int pid, unsigned long long currentTime);
+};
 
-                for (int i = 18; i < 22; ++i) iss >> dummy;
-                iss >> starttime;
-
-                long totalTime = utime + stime + cutime + cstime;
-                double seconds = uptime - (starttime / (double)clk_tck);
-                double cpuUsage = 0.0;
-                if (seconds > 0)
-                    cpuUsage = 100.0 * ((totalTime / (double)clk_tck) / seconds);
-
-                processes.push_back({ pid, comm, cpuUsage });
-            }
-        }
-    }
-    closedir(dir);
-    return processes;
-}
-
-void displayTopCPUProcesses(int topN = 5) {
-    auto processes = getProcessesCPUUsage();
-
-    std::sort(processes.begin(), processes.end(),
-              [](const ProcessInfo& a, const ProcessInfo& b) {
-                  return a.cpuUsage > b.cpuUsage;
-              });
-
-    std::cout << std::left << std::setw(8) << "PID"
-              << std::setw(25) << "Command"
-              << std::setw(10) << "CPU (%)" << std::endl;
-    std::cout << std::string(45, '-') << std::endl;
-
-    for (int i = 0; i < std::min(topN, (int)processes.size()); ++i) {
-        std::cout << std::left << std::setw(8) << processes[i].pid
-                  << std::setw(25) << processes[i].command
-                  << std::fixed << std::setprecision(2)
-                  << processes[i].cpuUsage << std::endl;
-    }
-}
+#endif // PROCESS_MONITOR_H
