@@ -1,3 +1,4 @@
+
 #ifndef SYSMON_H
 #define SYSMON_H
 
@@ -108,4 +109,3 @@ private:
     void monitorLoop();
 };
 
-#endif // SYSMON_H

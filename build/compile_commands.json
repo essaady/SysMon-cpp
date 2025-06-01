@@ -1,0 +1,27 @@
+[
+{
+  "directory": "/home/rat/ran_projects/SysMon-cpp/build",
+  "command": "/usr/bin/clang++ -I/home/rat/ran_projects/SysMon-cpp/./include -g -std=gnu++20 -o CMakeFiles/cpu.dir/src/CpuMonitor.cpp.o -c /home/rat/ran_projects/SysMon-cpp/src/CpuMonitor.cpp",
+  "file": "/home/rat/ran_projects/SysMon-cpp/src/CpuMonitor.cpp"
+},
+{
+  "directory": "/home/rat/ran_projects/SysMon-cpp/build",
+  "command": "/usr/bin/clang++ -I/home/rat/ran_projects/SysMon-cpp/./include -g -std=gnu++20 -o CMakeFiles/cpu.dir/src/MemoryMonitor.cpp.o -c /home/rat/ran_projects/SysMon-cpp/src/MemoryMonitor.cpp",
+  "file": "/home/rat/ran_projects/SysMon-cpp/src/MemoryMonitor.cpp"
+},
+{
+  "directory": "/home/rat/ran_projects/SysMon-cpp/build",
+  "command": "/usr/bin/clang++ -I/home/rat/ran_projects/SysMon-cpp/./include -g -std=gnu++20 -o CMakeFiles/cpu.dir/src/SysMon.cpp.o -c /home/rat/ran_projects/SysMon-cpp/src/SysMon.cpp",
+  "file": "/home/rat/ran_projects/SysMon-cpp/src/SysMon.cpp"
+},
+{
+  "directory": "/home/rat/ran_projects/SysMon-cpp/build",
+  "command": "/usr/bin/clang++ -I/home/rat/ran_projects/SysMon-cpp/./include -g -std=gnu++20 -o CMakeFiles/cpu.dir/src/ProcessMonitor.cpp.o -c /home/rat/ran_projects/SysMon-cpp/src/ProcessMonitor.cpp",
+  "file": "/home/rat/ran_projects/SysMon-cpp/src/ProcessMonitor.cpp"
+},
+{
+  "directory": "/home/rat/ran_projects/SysMon-cpp/build",
+  "command": "/usr/bin/clang++ -g -std=gnu++20 -o CMakeFiles/SysMon.dir/src/main.cpp.o -c /home/rat/ran_projects/SysMon-cpp/src/main.cpp",
+  "file": "/home/rat/ran_projects/SysMon-cpp/src/main.cpp"
+}
+]

@@ -1,3 +1,4 @@
+
 #ifndef MEMORY_MONITOR_H
 #define MEMORY_MONITOR_H
 
@@ -96,4 +97,3 @@ private:
     bool readMemInfo();
 };
 
-#endif // MEMORY_MONITOR_H
