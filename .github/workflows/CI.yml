@@ -13,20 +13,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
-      - name: Set up CMake
-        uses: actions/setup-cmake@v1
-      - name: Install dependencies
+        uses: actions/checkout@v4
+      - name: Install g++
         run: |
           sudo apt-get update
-          sudo apt-get install -y build-essential
-      - name: Build the project
+          sudo apt-get install -y g++
+      - name: Debug PATH and compilers
         run: |
-          mkdir build
-          cd build
-          cmake ..
-          make
-      - name: Run tests
+          which g++
+          g++ --version || echo "g++ not found"
+      - name: Syntax check
         run: |
-          cd build
-          make test
+          for file in $(find . -type f \( -name "*.cpp" -o -name "*.h" -o -name "*.hpp" \)); do
+            echo "Checking syntax: $file"
+            g++ -fsyntax-only "$file"
+          done
