@@ -22,6 +22,12 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+      - name: Set up CMakeAdd commentMore actions
+        uses: actions/setup-cmake@v4
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential
       - name: Install g++
         run: |
           sudo apt-get update
