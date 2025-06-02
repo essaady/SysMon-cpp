@@ -1,6 +1,5 @@
 #ifndef CPUMONITOR_H
 #define CPUMONITOR_H
-
 #include <vector>
 #include <string>
 #include <chrono>
