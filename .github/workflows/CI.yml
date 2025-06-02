@@ -4,9 +4,17 @@ on:
   pull_request:
     branches:
       - dev
+    paths:
+      - '**/*.cpp'
+      - '**/*.h'
+      - '**/*.hpp'
   push:
     branches:
       - dev
+    paths:
+      - '**/*.cpp'
+      - '**/*.h'
+      - '**/*.hpp'
 
 jobs:
   build:
