@@ -8,18 +8,23 @@ public:
 CpuMonitor();
 ~CpuMonitor();
 bool update();
-double totalUsage() const;
+float getCpuUsage() const;
+float getCpuFreq() const;
+float getCpuInfo() const;
 std::map<std::string,double> CoreUsage() const;
 std::string exportText() const;
 std::string exportCSV() const;
 private:
-   struct CPUdata {
-    unsigned user,nice,system,idle,iowait,irq,softirq,steal,guest,guest_nice;
+   struct CPU {
+   short nbrCPU;
+   float* usagePerCPU;
+   float frequency;
+   float frequencyMax;
 };
-std::map<std::string,CPUdata> prevCpuData;
-std::map<std::string,CPUdata> currentCpuData;
+std::map<std::string,CPU> prevCpuData;
+std::map<std::string,CPU> currentCpuData;
 std::map<std::string,double> cpuUsage;
-double calculUsage(const CPUdata& prev,const CPUdata& current) const;
+double calculUsage(const CPU& prev,const CPU& current) const;
 bool readCPUdata();
 };
 #endif
