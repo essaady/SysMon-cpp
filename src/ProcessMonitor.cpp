@@ -1,34 +1,25 @@
 #include "../include/ProcessMonitor.h"
+#include "../include/SysMon.h"
+#include <string>
+#include <vector>
 
-std::vector<std::string> getVector(std::istringstream &iss)
-{
-    int i = 0;
-    std::vector<std::string> info;
-    std::string content;
-    while (iss >> content && i < 13)
-    {
-        info.push_back(content);
-        i++;
-    }
 
-    return info;
+using namespace std;
+
+// Constructeur
+ProcessMonitor::ProcessMonitor() {
+    // Initialisation des ressources si nécessaire
 }
 
-bool isNumber(std::string &string)
-{
-    bool isNumber = true;
-    for (auto str : string)
-    {
-        if (!std::isdigit(str))
-        {
-            isNumber = false;
-            break;
-        }
-    }
-    return isNumber;
+
+// Destructeur
+ProcessMonitor::~ProcessMonitor() {
+    // Libération des ressources si nécessaire
+
 }
 
-void ProcMon::getProcess()
+
+std::string ProcessMonitor::getProcessRaw()
 {
     std::cout << "\x1b[42m Name       " << "PID        \x1b[0m\n";
     std::string path = "/proc";
@@ -39,7 +30,7 @@ void ProcMon::getProcess()
         std::string pathFileName = entry.path().filename();
         if (isNumber(pathFileName))
         {
-            std::string fileContent = getInfo(newPath + "/status");
+            std::string fileContent = SysMon::getInfo(newPath + "/status");
             if(fileContent == " "){
                 continue;
             }
@@ -54,4 +45,11 @@ void ProcMon::getProcess()
 
 
     std::cout << "There are : " << processCount << " processes\n";
+    return " ";
+}
+
+bool ProcessMonitor::update(){
+    //To-Do
+    getProcessRaw();
+    return true;
 }

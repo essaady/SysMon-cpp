@@ -1,8 +1,4 @@
-#include <iostream>
-#include "../include/MemoryMonitor.h"
-#include "../include/CpuMonitor.h"
-#include "../include/ProcessMonitor.h"
-
+#include "../include/SysMon.h"
 
 
 int main(int argc, char *argv[])
@@ -10,9 +6,9 @@ int main(int argc, char *argv[])
 
     // clear the screen on start
     system("clear");
-    std::vector<std::string> options = {"--help", "--update", "--export"};
-    int option = 0;
+    vector<string> options = {"--help", "--update", "--export"};
     // checking for user argument
+    int option = 0;
     if (argc >= 2)
     {
         bool isReconized = false;
@@ -38,23 +34,10 @@ int main(int argc, char *argv[])
             option = options::_NLOG;
         }
     }
-
-    CpuMon cpu;
-    MemInfo mem;
-    ProcMon process;
-    // Calculating and printing both cpu and memory usage
-    int i = 0;
-    while (i < 10)
-    {
-        usleep(1000000);
-
-        system("clear");
-        cpu.calcCpuUsage(option);
-        mem.memUsage(option);
-        process.getProcess();
-        i++;
-    }
-
     
-    return 0;
+    int updateInterval = 5e5;
+    
+    SysMon SysMonCpp(updateInterval);
+
+    return SysMonCpp.run();
 }
