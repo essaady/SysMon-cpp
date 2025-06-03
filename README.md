@@ -1,6 +1,11 @@
+<p align="center">
+  <img src="assets/LOGO.png" alt="SysMon Logo" width="200"/>
+</p>
 # SysMon-cpp
 
 ## Description
+## Test Pull Request
+updeat READEME
 
 **SysMon-cpp** est un moniteur système développé en **C++** permettant de surveiller en temps réel l'utilisation des ressources du système, telles que le processeur (CPU), la mémoire (RAM), et les processus actifs. Inspiré des outils `top` et `htop`, il fournit une interface en ligne de commande (CLI) pour afficher des informations système critiques en temps réel.
 
