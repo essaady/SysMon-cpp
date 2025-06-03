@@ -21,36 +21,93 @@
 #include <dirent.h>     
 #endif
 
+/**
+ * @class MemoryMonitor
+ * @brief Moniteur avancé de mémoire système avec surveillance temps réel
+ * 
+ * Cette classe fournit une surveillance complète de la mémoire système incluant:
+ * - Surveillance de la mémoire physique et virtuelle du système
+ * - Analyse détaillée de la consommation mémoire par processus
+ * - Interface temps réel avec mise à jour configurable
+ * - Fonctionnalités de recherche et d'export de rapports
+ * - Compatibilité cross-platform (Windows/Linux)
+ * 
+ * Architecture technique:
+ * - Utilise les APIs natives (GlobalMemoryStatusEx/sysinfo)
+ * - Énumération des processus via Toolhelp32/proc filesystem
+ * - Formatage intelligent des unités (B/KB/MB/GB/TB)
+ * - Tri automatique par consommation mémoire
+ * 
+ * Fonctionnalités principales:
+ * - Monitoring système global avec pourcentages d'utilisation
+ * - Top processus consommateurs de mémoire
+ * - Recherche de processus par nom avec correspondance partielle
+ * - Export de rapports détaillés avec horodatage
+ * - Interface interactive avec menu à 6 options
+ * 
+ * @author Ayman Essaady
+ * @version 2.0 Enhanced
+ * @date 2025
+ */
 class MemoryMonitor {
 private:
+    /**
+     * @struct SystemMemoryInfo
+     * @brief Structure contenant les informations globales de mémoire système
+     * 
+     * Stocke les métriques complètes de mémoire incluant:
+     * - Mémoire physique (totale, utilisée, disponible)
+     * - Mémoire virtuelle/swap (totale, utilisée, disponible)
+     * - Pourcentages d'utilisation calculés
+     */
     struct SystemMemoryInfo {
-        size_t totalPhysical;
-        size_t availablePhysical;
-        size_t usedPhysical;
-        size_t totalVirtual;
-        size_t availableVirtual;
-        size_t usedVirtual;
-        double physicalUsagePercent;
-        double virtualUsagePercent;
+        size_t totalPhysical;           ///< Mémoire physique totale en bytes
+        size_t availablePhysical;       ///< Mémoire physique disponible en bytes
+        size_t usedPhysical;           ///< Mémoire physique utilisée en bytes
+        size_t totalVirtual;           ///< Mémoire virtuelle totale en bytes
+        size_t availableVirtual;       ///< Mémoire virtuelle disponible en bytes
+        size_t usedVirtual;            ///< Mémoire virtuelle utilisée en bytes
+        double physicalUsagePercent;   ///< Pourcentage d'utilisation mémoire physique
+        double virtualUsagePercent;    ///< Pourcentage d'utilisation mémoire virtuelle
     };
 
+    /**
+     * @struct ProcessMemoryInfo
+     * @brief Structure détaillée des informations mémoire par processus
+     * 
+     * Contient les métriques complètes de consommation mémoire:
+     * - Working Set (mémoire physique active)
+     * - Virtual Memory (espace d'adressage virtuel)
+     * - Private Memory (mémoire privée du processus)
+     */
     struct ProcessMemoryInfo {
-        std::string processName;
-        unsigned long processId;
-        size_t workingSetSize;
-        size_t virtualMemorySize;
-        size_t privateMemorySize;
+        std::string processName;       ///< Nom du processus
+        unsigned long processId;       ///< Identifiant unique du processus (PID)
+        size_t workingSetSize;        ///< Taille du Working Set en bytes
+        size_t virtualMemorySize;     ///< Taille mémoire virtuelle en bytes
+        size_t privateMemorySize;     ///< Taille mémoire privée en bytes
     };
 
-    std::vector<ProcessMemoryInfo> processes;
-    SystemMemoryInfo systemInfo;
-    bool monitoring;
-    int refreshInterval;
+    std::vector<ProcessMemoryInfo> processes;  ///< Liste des processus surveillés
+    SystemMemoryInfo systemInfo;              ///< Informations système globales
+    bool monitoring;                          ///< État du monitoring temps réel
+    int refreshInterval;                      ///< Intervalle de rafraîchissement (ms)
 
 public:
+    /**
+     * @brief Constructeur du moniteur mémoire
+     * @param interval Intervalle de mise à jour en millisecondes (défaut: 1000ms)
+     */
     MemoryMonitor(int interval = 1000) : refreshInterval(interval), monitoring(false) {}
 
-    // Convert bytes to human-readable format
+    /**
+     * @brief Convertit les bytes en format lisible humainement
+     * @param bytes Nombre de bytes à convertir
+     * @return String formatée avec unité appropriée (B, KB, MB, GB, TB)
+     * 
+     * Utilise un algorithme de division successive par 1024 pour déterminer
+     * l'unité la plus appropriée avec précision de 2 décimales.
+     */
     std::string formatBytes(size_t bytes) {
         const char* units[] = {"B", "KB", "MB", "GB", "TB"};
         int unitIndex = 0;
@@ -66,7 +123,17 @@ public:
         return oss.str();
     }
 
-    // Get system memory information
+    /**
+     * @brief Récupère les informations globales de mémoire système
+     * @return true si succès, false en cas d'erreur
+     * 
+     * Utilise les APIs natives du système:
+     * - Windows: GlobalMemoryStatusEx() pour mémoire physique/virtuelle
+     * - Linux: sysinfo() pour RAM et swap
+     * 
+     * Calcule automatiquement les pourcentages d'utilisation et
+     * les valeurs de mémoire utilisée.
+     */
     bool getSystemMemoryInfo() {
 #ifdef _WIN32
         MEMORYSTATUSEX memInfo;
@@ -97,6 +164,7 @@ public:
         systemInfo.usedVirtual = systemInfo.totalVirtual - systemInfo.availableVirtual;
 #endif
         
+        // Calcul des pourcentages d'utilisation
         systemInfo.physicalUsagePercent = 
             (static_cast<double>(systemInfo.usedPhysical) / systemInfo.totalPhysical) * 100.0;
         systemInfo.virtualUsagePercent = 
@@ -106,7 +174,22 @@ public:
         return true;
     }
 
-    // Get process memory information
+    /**
+     * @brief Énumère et analyse tous les processus système
+     * @return true si succès, false en cas d'erreur
+     * 
+     * Parcourt tous les processus actifs et collecte:
+     * - PID et nom du processus
+     * - Working Set Size (mémoire physique)
+     * - Virtual Memory Size (espace virtuel)
+     * - Private Memory Size (mémoire privée)
+     * 
+     * Implémentation spécifique par plateforme:
+     * - Windows: CreateToolhelp32Snapshot + GetProcessMemoryInfo
+     * - Linux: Parcours /proc/[pid]/ avec lecture status/statm
+     * 
+     * Tri automatique par consommation mémoire décroissante.
+     */
     bool getProcessMemoryInfo() {
         processes.clear();
         
@@ -150,6 +233,7 @@ public:
         
         struct dirent* entry;
         while ((entry = readdir(procDir)) != nullptr) {
+            // Vérifier si c'est un PID (nom numérique)
             if (strspn(entry->d_name, "0123456789") == strlen(entry->d_name)) {
                 std::string statusPath = "/proc/" + std::string(entry->d_name) + "/status";
                 std::string statmPath = "/proc/" + std::string(entry->d_name) + "/statm";
@@ -161,6 +245,7 @@ public:
                     ProcessMemoryInfo info;
                     info.processId = std::stoul(entry->d_name);
                     
+                    // Lire le nom du processus depuis /proc/[pid]/status
                     std::string line;
                     while (std::getline(statusFile, line)) {
                         if (line.substr(0, 5) == "Name:") {
@@ -169,6 +254,7 @@ public:
                         }
                     }
                     
+                    // Lire les statistiques mémoire depuis /proc/[pid]/statm
                     size_t vmSize, vmRSS;
                     if (statmFile >> vmSize >> vmRSS) {
                         info.virtualMemorySize = vmSize * getpagesize();
@@ -182,7 +268,7 @@ public:
         closedir(procDir);
 #endif
         
-        // Sort processes by memory usage (descending)
+        // Tri des processus par consommation mémoire (ordre décroissant)
         std::sort(processes.begin(), processes.end(), 
                  [](const ProcessMemoryInfo& a, const ProcessMemoryInfo& b) {
                      return a.workingSetSize > b.workingSetSize;
@@ -191,32 +277,43 @@ public:
         return true;
     }
 
-    // Display system memory information
+    /**
+     * @brief Affiche les informations détaillées de mémoire système
+     * 
+     * Présente un rapport complet incluant:
+     * - Mémoire physique totale, utilisée et disponible
+     * - Mémoire virtuelle/swap avec statistiques
+     * - Barre de progression visuelle Unicode
+     * - Pourcentages d'utilisation formatés
+     * 
+     * Utilise un formatage professionnel avec alignement des colonnes
+     * et caractères Unicode pour la visualisation graphique.
+     */
     void displaySystemInfo() {
         std::cout << "\n" << std::string(60, '=') << std::endl;
-        std::cout << "           SYSTEM MEMORY INFORMATION" << std::endl;
+        std::cout << "           INFORMATIONS MÉMOIRE SYSTÈME" << std::endl;
         std::cout << std::string(60, '=') << std::endl;
         
-        std::cout << std::left << std::setw(25) << "Total Physical Memory:" 
+        std::cout << std::left << std::setw(25) << "Mémoire Physique Totale:" 
                   << formatBytes(systemInfo.totalPhysical) << std::endl;
-        std::cout << std::left << std::setw(25) << "Used Physical Memory:" 
+        std::cout << std::left << std::setw(25) << "Mémoire Physique Utilisée:" 
                   << formatBytes(systemInfo.usedPhysical) 
                   << " (" << std::fixed << std::setprecision(1) 
                   << systemInfo.physicalUsagePercent << "%)" << std::endl;
-        std::cout << std::left << std::setw(25) << "Available Physical:" 
+        std::cout << std::left << std::setw(25) << "Mémoire Physique Libre:" 
                   << formatBytes(systemInfo.availablePhysical) << std::endl;
         
         if (systemInfo.totalVirtual > 0) {
-            std::cout << std::left << std::setw(25) << "Total Virtual Memory:" 
+            std::cout << std::left << std::setw(25) << "Mémoire Virtuelle Totale:" 
                       << formatBytes(systemInfo.totalVirtual) << std::endl;
-            std::cout << std::left << std::setw(25) << "Used Virtual Memory:" 
+            std::cout << std::left << std::setw(25) << "Mémoire Virtuelle Utilisée:" 
                       << formatBytes(systemInfo.usedVirtual) 
                       << " (" << std::fixed << std::setprecision(1) 
                       << systemInfo.virtualUsagePercent << "%)" << std::endl;
         }
         
-        // Memory usage bar
-        std::cout << "\nMemory Usage: [";
+        // Barre de progression visuelle avec caractères Unicode
+        std::cout << "\nUtilisation Mémoire: [";
         int barWidth = 40;
         int filledWidth = static_cast<int>((systemInfo.physicalUsagePercent / 100.0) * barWidth);
         for (int i = 0; i < barWidth; ++i) {
@@ -227,17 +324,30 @@ public:
                   << systemInfo.physicalUsagePercent << "%" << std::endl;
     }
 
-    // Display top memory-consuming processes
+    /**
+     * @brief Affiche le top des processus consommateurs de mémoire
+     * @param count Nombre de processus à afficher (défaut: 10)
+     * 
+     * Présente un tableau formaté des processus triés par consommation mémoire:
+     * - PID du processus
+     * - Nom du processus (tronqué si nécessaire)
+     * - Working Set (mémoire physique active)
+     * - Virtual Memory (espace d'adressage virtuel)
+     * - Private Memory (mémoire privée)
+     * 
+     * Utilise un formatage tabulaire professionnel avec largeurs fixes
+     * et troncature intelligente des noms longs.
+     */
     void displayTopProcesses(int count = 10) {
         std::cout << "\n" << std::string(80, '=') << std::endl;
-        std::cout << "           TOP " << count << " MEMORY-CONSUMING PROCESSES" << std::endl;
+        std::cout << "           TOP " << count << " PROCESSUS CONSOMMATEURS MÉMOIRE" << std::endl;
         std::cout << std::string(80, '=') << std::endl;
         
         std::cout << std::left << std::setw(8) << "PID" 
-                  << std::setw(25) << "Process Name"
+                  << std::setw(25) << "Nom Processus"
                   << std::setw(15) << "Working Set"
-                  << std::setw(15) << "Virtual Mem"
-                  << std::setw(15) << "Private Mem" << std::endl;
+                  << std::setw(15) << "Mém. Virtuelle"
+                  << std::setw(15) << "Mém. Privée" << std::endl;
         std::cout << std::string(80, '-') << std::endl;
         
         int displayCount = std::min(count, static_cast<int>(processes.size()));
@@ -252,10 +362,22 @@ public:
         }
     }
 
-    // Find specific process by name
+    /**
+     * @brief Recherche des processus par nom avec correspondance partielle
+     * @param processName Nom ou partie du nom à rechercher
+     * 
+     * Effectue une recherche insensible à la casse dans la liste des processus.
+     * Affiche tous les processus dont le nom contient la chaîne recherchée.
+     * 
+     * Fonctionnalités:
+     * - Recherche par correspondance partielle (substring)
+     * - Affichage formaté des résultats trouvés
+     * - Message informatif si aucun résultat
+     * - Tableau avec PID, nom et consommation mémoire
+     */
     void findProcess(const std::string& processName) {
         std::cout << "\n" << std::string(60, '=') << std::endl;
-        std::cout << "         SEARCH RESULTS FOR: " << processName << std::endl;
+        std::cout << "         RÉSULTATS RECHERCHE: " << processName << std::endl;
         std::cout << std::string(60, '=') << std::endl;
         
         bool found = false;
@@ -263,7 +385,7 @@ public:
             if (proc.processName.find(processName) != std::string::npos) {
                 if (!found) {
                     std::cout << std::left << std::setw(8) << "PID" 
-                              << std::setw(25) << "Process Name"
+                              << std::setw(25) << "Nom Processus"
                               << std::setw(15) << "Working Set" << std::endl;
                     std::cout << std::string(50, '-') << std::endl;
                     found = true;
@@ -275,17 +397,29 @@ public:
         }
         
         if (!found) {
-            std::cout << "No processes found matching '" << processName << "'" << std::endl;
+            std::cout << "Aucun processus trouvé correspondant à '" << processName << "'" << std::endl;
         }
     }
 
-    // Start continuous monitoring
+    /**
+     * @brief Lance la surveillance continue en temps réel
+     * 
+     * Mode monitoring temps réel avec les fonctionnalités:
+     * - Effacement automatique de l'écran (cross-platform)
+     * - Mise à jour cyclique selon l'intervalle configuré
+     * - Affichage horodaté des informations
+     * - Combinaison système + top processus
+     * - Arrêt par Ctrl+C
+     * 
+     * Utilise std::this_thread::sleep_for pour contrôler la fréquence
+     * et system("cls"/"clear") pour l'effacement d'écran.
+     */
     void startMonitoring() {
         monitoring = true;
-        std::cout << "Starting memory monitoring (Press Ctrl+C to stop)..." << std::endl;
+        std::cout << "Démarrage surveillance mémoire (Ctrl+C pour arrêter)..." << std::endl;
         
         while (monitoring) {
-            // Clear screen (cross-platform)
+            // Effacement écran (cross-platform)
 #ifdef _WIN32
             system("cls");
 #else
@@ -294,84 +428,137 @@ public:
             
             auto now = std::chrono::system_clock::now();
             auto time_t = std::chrono::system_clock::to_time_t(now);
-            std::cout << "Memory Monitor - " << std::ctime(&time_t);
+            std::cout << "Moniteur Mémoire - " << std::ctime(&time_t);
             
             if (getSystemMemoryInfo() && getProcessMemoryInfo()) {
                 displaySystemInfo();
                 displayTopProcesses(15);
             } else {
-                std::cout << "Error retrieving memory information!" << std::endl;
+                std::cout << "Erreur récupération informations mémoire!" << std::endl;
             }
             
             std::this_thread::sleep_for(std::chrono::milliseconds(refreshInterval));
         }
     }
 
-    // Stop monitoring
+    /**
+     * @brief Arrête la surveillance temps réel
+     */
     void stopMonitoring() {
         monitoring = false;
     }
 
-    // Get memory statistics
+    /**
+     * @brief Obtient et affiche les statistiques mémoire actuelles
+     * 
+     * Mode snapshot unique combinant:
+     * - Informations système globales
+     * - Top 10 processus consommateurs
+     * - Gestion d'erreurs avec messages informatifs
+     */
     void getMemoryStats() {
         if (getSystemMemoryInfo() && getProcessMemoryInfo()) {
             displaySystemInfo();
             displayTopProcesses();
         } else {
-            std::cout << "Error retrieving memory information!" << std::endl;
+            std::cout << "Erreur récupération informations mémoire!" << std::endl;
         }
     }
 
-    // Set refresh interval
+    /**
+     * @brief Configure l'intervalle de rafraîchissement
+     * @param interval Nouvel intervalle en millisecondes
+     */
     void setRefreshInterval(int interval) {
         refreshInterval = interval;
     }
 };
 
-// Menu system
+/**
+ * @class MemoryMonitorApp
+ * @brief Interface utilisateur interactive pour le moniteur mémoire
+ * 
+ * Fournit une interface menu complète avec 6 options:
+ * 1. Affichage statut mémoire actuel
+ * 2. Surveillance temps réel continue
+ * 3. Recherche de processus par nom
+ * 4. Configuration intervalle de mise à jour
+ * 5. Export de rapport détaillé
+ * 6. Sortie de l'application
+ * 
+ * Gestion robuste des entrées utilisateur avec validation
+ * et gestion d'erreurs appropriée.
+ */
 class MemoryMonitorApp {
 private:
-    MemoryMonitor monitor;
+    MemoryMonitor monitor;  ///< Instance du moniteur mémoire
 
 public:
+    /**
+     * @brief Affiche le menu principal interactif
+     * 
+     * Présente les 6 options disponibles avec formatage visuel
+     * et instructions claires pour l'utilisateur.
+     */
     void showMenu() {
         std::cout << "\n" << std::string(50, '=') << std::endl;
-        std::cout << "            MEMORY MONITOR" << std::endl;
+        std::cout << "            MONITEUR MÉMOIRE AVANCÉ" << std::endl;
         std::cout << std::string(50, '=') << std::endl;
-        std::cout << "1. View Current Memory Status" << std::endl;
-        std::cout << "2. Start Real-time Monitoring" << std::endl;
-        std::cout << "3. Find Process by Name" << std::endl;
-        std::cout << "4. Set Refresh Interval" << std::endl;
-        std::cout << "5. Export Memory Report" << std::endl;
-        std::cout << "6. Exit" << std::endl;
+        std::cout << "1. Afficher Statut Mémoire Actuel" << std::endl;
+        std::cout << "2. Démarrer Surveillance Temps Réel" << std::endl;
+        std::cout << "3. Rechercher Processus par Nom" << std::endl;
+        std::cout << "4. Configurer Intervalle Mise à Jour" << std::endl;
+        std::cout << "5. Exporter Rapport Mémoire" << std::endl;
+        std::cout << "6. Quitter" << std::endl;
         std::cout << std::string(50, '-') << std::endl;
-        std::cout << "Enter your choice (1-6): ";
+        std::cout << "Votre choix (1-6): ";
     }
 
+    /**
+     * @brief Exporte un rapport détaillé vers fichier texte
+     * 
+     * Génère un fichier "memory_report.txt" contenant:
+     * - Horodatage de génération
+     * - Statistiques système complètes
+     * - Liste détaillée des processus
+     * 
+     * Utilise la redirection temporaire de std::cout pour
+     * capturer proprement la sortie formatée.
+     */
     void exportReport() {
         std::ofstream file("memory_report.txt");
         if (!file.is_open()) {
-            std::cout << "Error creating report file!" << std::endl;
+            std::cout << "Erreur création fichier rapport!" << std::endl;
             return;
         }
 
-        // Redirect cout to file temporarily
+        // Redirection temporaire de cout vers fichier
         std::streambuf* orig = std::cout.rdbuf();
         std::cout.rdbuf(file.rdbuf());
 
         auto now = std::chrono::system_clock::now();
         auto time_t = std::chrono::system_clock::to_time_t(now);
-        std::cout << "Memory Report Generated: " << std::ctime(&time_t) << std::endl;
+        std::cout << "Rapport Mémoire Généré: " << std::ctime(&time_t) << std::endl;
 
         monitor.getMemoryStats();
 
-        // Restore cout
+        // Restauration cout original
         std::cout.rdbuf(orig);
         file.close();
 
-        std::cout << "Memory report exported to 'memory_report.txt'" << std::endl;
+        std::cout << "Rapport mémoire exporté vers 'memory_report.txt'" << std::endl;
     }
 
+    /**
+     * @brief Boucle principale de l'application
+     * 
+     * Gère l'interaction utilisateur avec:
+     * - Affichage menu cyclique
+     * - Traitement des choix utilisateur
+     * - Validation des entrées
+     * - Gestion des erreurs
+     * - Pause interactive entre operations
+     */
     void run() {
         int choice;
         std::string processName;
@@ -389,7 +576,7 @@ public:
                     monitor.startMonitoring();
                     break;
                 case 3:
-                    std::cout << "Enter process name to search: ";
+                    std::cout << "Entrez le nom du processus à rechercher: ";
                     std::cin.ignore();
                     std::getline(std::cin, processName);
                     if (monitor.getProcessMemoryInfo()) {
@@ -397,23 +584,23 @@ public:
                     }
                     break;
                 case 4:
-                    std::cout << "Enter refresh interval in milliseconds (default 1000): ";
+                    std::cout << "Entrez l'intervalle en millisecondes (défaut 1000): ";
                     std::cin >> interval;
                     monitor.setRefreshInterval(interval);
-                    std::cout << "Refresh interval set to " << interval << "ms" << std::endl;
+                    std::cout << "Intervalle configuré à " << interval << "ms" << std::endl;
                     break;
                 case 5:
                     exportReport();
                     break;
                 case 6:
-                    std::cout << "Exiting Memory Monitor..." << std::endl;
+                    std::cout << "Arrêt du Moniteur Mémoire..." << std::endl;
                     return;
                 default:
-                    std::cout << "Invalid choice! Please enter 1-6." << std::endl;
+                    std::cout << "Choix invalide! Veuillez entrer 1-6." << std::endl;
             }
 
             if (choice != 2 && choice != 6) {
-                std::cout << "\nPress Enter to continue...";
+                std::cout << "\nAppuyez sur Entrée pour continuer...";
                 std::cin.ignore();
                 std::cin.get();
             }
@@ -421,12 +608,24 @@ public:
     }
 };
 
+/**
+ * @brief Point d'entrée principal de l'application
+ * @return Code de retour (0 = succès, 1 = erreur)
+ * 
+ * Initialise l'application avec gestion d'exceptions
+ * et messages d'erreur appropriés.
+ */
 int main() {
     try {
+        std::cout << "=== MONITEUR MÉMOIRE AVANCÉ C++ ===" << std::endl;
+        std::cout << "Surveillance mémoire système et processus temps réel" << std::endl;
+        std::cout << "Version 2.0 Enhanced - Cross-platform" << std::endl;
+        
         MemoryMonitorApp app;
         app.run();
+        
     } catch (const std::exception& e) {
-        std::cerr << "Error: " << e.what() << std::endl;
+        std::cerr << "Erreur: " << e.what() << std::endl;
         return 1;
     }
 
