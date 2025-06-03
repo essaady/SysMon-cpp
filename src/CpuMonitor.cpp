@@ -10,8 +10,8 @@ using namespace std;
 
 // The explication in the CpuMonitor.h
 
-vector<unsigned long> CpuMonitor::CPU;
-vector<vector<unsigned long>> CpuMonitor::CORES;
+std::vector<unsigned long> CpuMonitor::CPU;
+std::vector<std::vector<unsigned long>> CpuMonitor::CORES;
 unsigned int CpuMonitor::CORES_NUMBER = 0;
 unsigned long CpuMonitor::INTERRUPTS = 0;
 unsigned long CpuMonitor::CONTEXT_SWITCHES = 0;
@@ -19,10 +19,10 @@ unsigned long CpuMonitor::BOOT_TIME = 0;
 unsigned long CpuMonitor::PROCESSES = 0;
 unsigned long CpuMonitor::PROCESSES_RUNNING = 0;
 unsigned long CpuMonitor::PROCESSES_BLOCKED = 0;
-vector<unsigned long> CpuMonitor::SOFT_IRQS;
+std::vector<unsigned long> CpuMonitor::SOFT_IRQS;
 
 
-bool IsNumber(string S){
+bool IsNumber(std::string S){
     for(char c : S){
         if(!(c >= 48 && c <= 57)){
             return false;
@@ -31,12 +31,12 @@ bool IsNumber(string S){
     return true;
 }
 
-vector <unsigned long> CpuMonitor::Split(string Line, bool SingleValue){
+std::vector <unsigned long> CpuMonitor::Split(std::string Line, bool SingleValue){
     return Split(Line, " ", SingleValue);
 }
 
-vector <unsigned long> CpuMonitor::Split(string Line, string Delim = " ", bool SingleValue = false){
-    vector<unsigned long> Values;
+std::vector <unsigned long> CpuMonitor::Split(std::string Line, std::string Delim = " ", bool SingleValue = false){
+    std::vector<unsigned long> Values;
     short pos = 0;
     string sWord; 
     while ((pos = Line.find(Delim)) != std::string::npos){

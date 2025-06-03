@@ -5,7 +5,7 @@
 #include <vector>
 
 
-using namespace std;
+
 
 ///////////////////////////////////////////////////////////////////////////
 //////////////////////                     ////////////////////////////////
@@ -38,8 +38,8 @@ class CpuMonitor{
     private :
     // These are some methodes that are used in reading the file,
     // so you don't need to call them or understand them
-    static vector <unsigned long> Split(string, bool );
-    static vector <unsigned long> Split(string, string, bool);
+    static std::vector <unsigned long> Split(std::string, bool );
+    static std::vector <unsigned long> Split(std::string, std::string, bool);
     static void ReadStatFile();
 
     // Declare the constructor as private so no one can 
@@ -73,14 +73,14 @@ class CpuMonitor{
     // CpuMonitor::CPU[3] or we can use the enum that we have created
     // like this : CpuMonitor::CPU[CpuMonitor::States::idle] 
     // so we don't have to remember the index of each state 
-    static vector<unsigned long> CPU;
+    static std::vector<unsigned long> CPU;
     
     // this is a vector of vectors, it stores the states of each core
     // the count starts by 0 so CORES[0] is the first core,
     // for example we want the idle time of the seconde core : 
     // CpuMonitor::Cores[1][3] or CpuMonitor::CORES[1][CpuMonitor::States::idle]
     // make sure you don't pass the CORES_NUMBER
-    static vector<vector<unsigned long>> CORES;
+    static std::vector<std::vector<unsigned long>> CORES;
 
     // The number of cores
     static unsigned int CORES_NUMBER;
@@ -106,7 +106,7 @@ class CpuMonitor{
     // This is a vector that contains the values of Software interrupts
     // that means (HI, TIMER, NET_TX, NET_RX, BLOCK, IRQ_POLL, TASKLET, SCHED, HRTIMER, RCU)
     // don't use the states enum because its not the case
-    static vector<unsigned long> SOFT_IRQS;
+    static std::vector<unsigned long> SOFT_IRQS;
 
     // This methode calls the read file methode 
     // so you can call it whenever you want new values
