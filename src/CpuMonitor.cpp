@@ -360,3 +360,4 @@ std::string CpuMonitor::getCpuInfo() {
 CpuMonitor::~CpuMonitor() {
     delete[] cpu.usagePerCPU;
 }
+
