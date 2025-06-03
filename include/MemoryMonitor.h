@@ -2,31 +2,33 @@
 #define MEMORY_MONITOR_H
 
 #include <string>
+#include <vector>
 using namespace std;
+
+struct ram {
+    size_t totalMemInMb;
+    float usage;
+    float freeMem;
+    size_t SwapMemInMb;
+    float usageSwp;
+    float freeSwp;
+};
 
 class MemoryMonitor {
 private:
-    unsigned long total_memory; //la memoire totale en KB
-    unsigned long free_memory; //la memoire libre en KB
-    bool readMemoryInfo(); //lire les donnees de memoire depuis /proc/meminfo
+    ram RAM;
+    vector<string> memInfo;
 
 public:
-    //constructeur par defaut 
-    MemoryMonitor();
-
-    //mettre a jour les donnees de memoire
     bool update();
-
-    //methodes pour obtenir les informations de memoire (getters)
-    unsigned long getTotalMemory() const;
-    unsigned long getFreeMemory() const;
-    unsigned long getUsedMemory() const;
-
-    //affiche les informations de memoire
-    void display() const;
-
-    //formater les valeurs de memoire en GB
-    string formatMemory(unsigned long memory_kb) const;
+    unsigned long getTotalMemory();
+    unsigned long getFreeMemory();
+    unsigned long getUsedMemory();
+    double getMemoryUsagePercentage();
+    unsigned long getTotalSwap();
+    unsigned long getFreeSwap();
+    unsigned long getUsedSwap();
+    double getSwapUsagePercentage();
 };
 
 #endif
