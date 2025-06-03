@@ -2,24 +2,25 @@
 #include <iostream>
 #include <fstream> //gestion des fichiers (on utilise ifstream)
 #include <sstream> //manipuler les flux de chaines de caracteres (istringstream et ostringstream)
-#include <format> // pour std::format
 
 using namespace std;
 
-//initialisation des valeurs a 0 et mise a jour
-MemoryMonitor::MemoryMonitor() : total_memory(0), free_memory(0) {
-    update();
-}
-
-bool MemoryMonitor::readMemoryInfo() {
+bool MemoryMonitor::update() {
     ifstream meminfo("/proc/meminfo"); //ifstream pour ouvrir le fichier "/proc/meminfo" en lecture
     if (!meminfo.is_open()) { //verifier si le fichier a bien ete ouvert
         cout << "Erreur: Impossible d'ouvrir /proc/meminfo" << endl;
         return false;
     }
 
+    //vider le vecteur memInfo avant de le remplir
+    memInfo.clear();
+    
     string line;
+    unsigned long total_memory = 0, free_memory = 0, total_swap = 0, free_swap = 0;
+    
     while (getline(meminfo, line)) { //lire le fichier ligne par ligne
+        memInfo.push_back(line); //stocker chaque ligne dans le vecteur
+        
         istringstream iss(line); //analyser et decouper la ligne pour extraire facilement les mots (flux d'entree depuis une chaine de caracteres)
         string key;
         unsigned long value;
@@ -32,41 +33,58 @@ bool MemoryMonitor::readMemoryInfo() {
             total_memory = value;
         } else if (key == "MemFree:") {
             free_memory = value;
+        } else if (key == "SwapTotal:") {
+            total_swap = value;
+        } else if (key == "SwapFree:") {
+            free_swap = value;
         }
     }
+
+    //mettre a jour la structure RAM
+    RAM.totalMemInMb = total_memory / 1024; //convertir de KB a MB
+    RAM.freeMem = static_cast<float>(free_memory) / 1024.0f; //convertir de KB a MB
+    // static_cast est un operateur pour faire le casting
+    //suffixe f (dans 1024.0f) indique que la constante est de type float, sans f le compilateur utilise double par defaut (32bits vs 64bits)
+    RAM.usage = static_cast<float>(total_memory - free_memory) / 1024.0f; //memoire utilisee en MB
+    
+    RAM.SwapMemInMb = total_swap / 1024; //convertir de KB a MB
+    RAM.freeSwp = static_cast<float>(free_swap) / 1024.0f; //convertir de KB a MB
+    RAM.usageSwp = static_cast<float>(total_swap - free_swap) / 1024.0f; //swap utilisee en MB
 
     meminfo.close(); //fermer le fichier quand la lecture terminee
     return true;
 }
 
-bool MemoryMonitor::update() {
-    return readMemoryInfo();
+unsigned long MemoryMonitor::getTotalMemory() {
+    return RAM.totalMemInMb * 1024; //en KB
 }
 
-unsigned long MemoryMonitor::getTotalMemory() const {
-    return total_memory;
+unsigned long MemoryMonitor::getFreeMemory() {
+    return static_cast<unsigned long>(RAM.freeMem * 1024); //en KB
 }
 
-unsigned long MemoryMonitor::getFreeMemory() const {
-    return free_memory;
+unsigned long MemoryMonitor::getUsedMemory() {
+    return static_cast<unsigned long>(RAM.usage * 1024); //en KB
 }
 
-unsigned long MemoryMonitor::getUsedMemory() const {
-    return total_memory - free_memory;
+double MemoryMonitor::getMemoryUsagePercentage() {
+    if (RAM.totalMemInMb == 0) return 0.0;
+    return (RAM.usage / RAM.totalMemInMb) * 100.0;
 }
 
-string MemoryMonitor::formatMemory(unsigned long memory_kb) const {
-    //convertir de KB a GB (1 GB = 1024 * 1024 KB)
-    double memory_gb = memory_kb / 1024.0 / 1024.0;
-
-    // Formatage du nombre avec une precision de 1 decimal
-    return std::format("{:.1f}", memory_gb);
+unsigned long MemoryMonitor::getTotalSwap() {
+    return RAM.SwapMemInMb * 1024; //en KB
 }
 
-//affichage
-void MemoryMonitor::display() const {
-    cout << "RAM Used: "
-         << formatMemory(getUsedMemory()) << " GB / "
-         << formatMemory(getTotalMemory()) << " GB"
-         << endl;
+unsigned long MemoryMonitor::getFreeSwap() {
+    return static_cast<unsigned long>(RAM.freeSwp * 1024); //en KB
+}
+
+unsigned long MemoryMonitor::getUsedSwap() {
+    return static_cast<unsigned long>(RAM.usageSwp * 1024); //en KB
+}
+
+double MemoryMonitor::getSwapUsagePercentage() {
+    if (RAM.SwapMemInMb == 0) return 0.0;
+    return (RAM.usageSwp / RAM.SwapMemInMb) * 100.0;
 }
