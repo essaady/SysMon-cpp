@@ -3,11 +3,16 @@
 
 #include <string>
 #include <map>
+#include <vector>
 
 class MemoryMonitor {
 public:
+    struct RAM {
+        std::vector<std::string> memInfo;
+    };
+
     MemoryMonitor();
-    ~MemoryMonitor();
+    ~MemoryMonitor() = default;
 
     bool update();
 
@@ -25,8 +30,15 @@ public:
     std::string exportAsCSV() const;
 
 private:
-    std::map<std::string, unsigned long long> memInfo;
+    size_t totalMemMb;
+    float freeMem;
+    size_t SwapMemMb;
+    float freeSwap;
+
+    RAM rawData;
+    std::map<std::string, unsigned long long> parsedInfo;
+
     bool readMemInfo();
 };
 
-#endif
+#endif // MEMORY_MONITOR_H
