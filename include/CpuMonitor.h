@@ -20,7 +20,9 @@ private:
    float* usagePerCPU;
    float frequency;
    float frequencyMax;
+   float usageCPU;
 };
+std::string rawCPU;
 std::map<std::string,CPU> prevCpuData;
 std::map<std::string,CPU> currentCpuData;
 std::map<std::string,double> cpuUsage;
