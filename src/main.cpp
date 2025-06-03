@@ -1,6 +1,7 @@
 #include <iostream>
 #include <thread> //pour utiliser std::this_thread::sleep_for() (mise en pause du programme)
 #include "../include/MemoryMonitor.h"
+#include <chrono> // pour utiliser chrono dans sleep_for
 
 using namespace std;
 
@@ -28,7 +29,7 @@ int main() {
         }
 
         //attendre 2 secondes avant la prochaine mise a jour
-        std::this_thread::sleep_for(2000); //temps d'attente en millisecondes (2000 ms = 2 secondes)
+        this_thread::sleep_for(chrono::seconds(2)); //l'utilisation de la fct chrono est naicessaire, voir la documentaion de la fct std::this_thread::sleep_for en https://devdocs.io/cpp/thread/sleep_for
     }
 
     return 0;
