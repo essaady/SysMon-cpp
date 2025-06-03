@@ -6,6 +6,7 @@
 #include <iostream>
 
 CpuMonitor::CpuMonitor() {
+    nbrCPU = sysconf(_SC_NPROCESSORS_ONLN);
     lastIdleTimes.resize(nbrCPU + 1);
     lastTotalTimes.resize(nbrCPU + 1);
     usagePerCPU.resize(nbrCPU + 1, 0.0f);

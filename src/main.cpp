@@ -1,6 +1,8 @@
 #include <iostream>
-#include <unistd.h>
+#include <unistd.h> // for sleep()
+#include <vector>
 #include "CpuMonitor.h"
+#include "ProcessMonitor.h"
 
 int main() {
     CpuMonitor cpu;
@@ -18,6 +20,16 @@ int main() {
 
         std::cout << "----------------------------------\n";
         sleep(1);
+    }
+
+    // processMonitor
+    ProcessMonitor proc;
+    if (proc.update()) {
+        std::cout << "\n===== Active Processes =====\n";
+        std::cout << "Number of processes: " << proc.getProcessCount() << "\n";
+        std::cout << proc.getProcessInfo();
+    } else {
+        std::cerr << "Failed to update process list.\n";
     }
 
     return 0;
