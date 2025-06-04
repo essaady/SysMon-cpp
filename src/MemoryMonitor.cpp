@@ -1,11 +1,32 @@
 #include "MemoryMonitor.h"
+#include <fstream>
+#include <string>
+#include <sstream>
 
-bool MemoryMonitor::update() { return true; }
-unsigned long MemoryMonitor::getTotalMemory() { return 0; }
-unsigned long MemoryMonitor::getFreeMemory() { return 0; }
-unsigned long MemoryMonitor::getUsedMemory() { return 0; }
-double MemoryMonitor::getMemoryUsagePercentage() { return 0.0; }
-unsigned long MemoryMonitor::getTotalSwap() { return 0; }
-unsigned long MemoryMonitor::getFreeSwap() { return 0; }
-unsigned long MemoryMonitor::getUsedSwap() { return 0; }
-double MemoryMonitor::getSwapUsagePercentage() { return 0.0; }
+MemoryMonitor::MemoryMonitor() {}
+
+double MemoryMonitor::getUsedMemoryMB() {
+    std::ifstream file("/proc/meminfo");
+    std::string line;
+    long memTotal = 0;
+    long memFree = 0;
+
+    while (std::getline(file, line)) {
+        std::istringstream iss(line);
+        std::string key;
+        long value;
+        std::string unit;
+        
+        iss >> key >> value >> unit;
+
+        if (key == "MemTotal:") {
+            memTotal = value;
+        } else if (key == "MemFree:") {
+            memFree = value;
+        }
+
+        if (memTotal && memFree) break; 
+    }
+
+    return (memTotal - memFree) / 1024.0; // transforme KB à MB
+}
