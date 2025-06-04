@@ -13,7 +13,7 @@ private:
         DWORD pid;
         std::string name;
         float cpuUsage;
-        SIZE_T memoryUsage; // RAM
+        SIZE_T memoryUsage; 
         std::string userName;
         std::string pathName;
         std::string startTime;
@@ -26,8 +26,8 @@ private:
     std::string getProcessStartTime(DWORD pid);
 
 public:
-    bool update(); // Remplit la liste 'processes'
+    bool update();
 
-    activeProcesses getProcess(int index); // Par index ou PID
-    std::string getProcessInfo();          // Résumé de tous les processus
+    activeProcesses getProcess(int index); 
+    std::string getProcessInfo();          
 };
