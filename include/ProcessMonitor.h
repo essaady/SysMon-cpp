@@ -1,40 +1,58 @@
-#pragma once
-#ifndef _PROCESSMONITOR_H
-#define _PROCESSMONITOR_H
+#ifndef PROCESSMONITOR_H
+#define PROCESSMONITOR_H
 
-#include <vector>
 #include <string>
-#include <sstream>
+#include <vector>
+#include <ctime>
 
-typedef struct ap{
+using namespace std;
+
+struct ProcessTime {
+    time_t startTime;
+    time_t runTime;
+    string startTimeStr;
+    string runTimeStr;
+};
+
+struct AP {
+    int PID;
+    string user;
     float cpu;
     float memory;
-    struct time;
-    std::string user;
-    std::string pathName;
-} activeProcesses;
+    ProcessTime processTime;
+    string pathName;
+    string processName;
+    string status;
+};
 
-
-
-class ProcessMonitor{
-protected:
-    activeProcesses AP;
+class ProcessMonitor {
+private:
+    int PID;
+    struct AP ap;
+    vector<AP> processList;
     int nbrProcess;
+    string user;
+    float cpu;
+    float memory;
+    ProcessTime time;
+    string pathName;
 
 public:
-    
     ProcessMonitor();
-
     ~ProcessMonitor();
-
-    bool update();
-
-    activeProcesses getProcess(int);
     
-    std::string getProcessInfo();
-
-    std::string getProcessRaw();
-
+    bool update();
+    AP getProcess(int index);
+    string getProcessInfo();
+    
+    int getNbrProcess() const { return nbrProcess; }
+    vector<AP> getProcessList() const { return processList; }
+    AP getProcessByPID(int pid);
+    vector<AP> getProcessesByUser(const string& userName);
+    vector<AP> getTopCpuProcesses(int count = 10);
+    vector<AP> getTopMemoryProcesses(int count = 10);
 };
 
 #endif
+
+

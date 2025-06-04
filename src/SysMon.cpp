@@ -1,102 +1,121 @@
-#include "../include/SysMon.h"
-#include <unistd.h>
-#include <fstream>
-#include <vector>
-#include <string>
+#include "SysMon.h"
+#include <iostream>
 #include <sstream>
+#include <iomanip>
+#include <ctime>
+#include <sys/utsname.h>
 
 using namespace std;
 
-SysMon::SysMon(int updateInterval, bool fullLog): CpuMonitor(), MemoryMonitor(), ProcessMonitor(){
-    this->updateInterval=updateInterval;
-    this->fullLog=fullLog;
-}
+int updateInterval = 1000; 
+string exportPath = "system_monitor_data";
+bool help = false;
 
-SysMon::~SysMon(){}
+static CpuMonitor* globalCpuMon = nullptr;
+static MemoryMonitor* globalMemMon = nullptr;
+static ProcessMonitor* globalProcMon = nullptr;
 
-
-int SysMon::run(int limit){
-    int i = 0;
-    while (i < limit)
-    {
-        usleep(updateInterval);
-        if(!fullLog){
-            system("clear");
-        }
-        update();
-        i++;
+string exportAsText() {
+    if (!globalCpuMon || !globalMemMon || !globalProcMon) {
+        return "Erreur: Données de surveillance non initialisées";
     }
-    return 0;
+    
+    stringstream ss;
+    ss << "=== RAPPORT DE SURVEILLANCE SYSTÈME ===" << endl;
+    ss << "Heure: " << getTime() << endl << endl;
+
+    ss << "--- PROCESSEUR ---" << endl;
+    ss << "Utilisation CPU: " << globalCpuMon->getCpuUsage() << "%" << endl;
+    ss << "Fréquence: " << globalCpuMon->getCpuFreq() << " MHz" << endl;
+    ss << "Nombre de cœurs: " << globalCpuMon->getNbrCPU() << endl;
+    ss << globalCpuMon->getCpuInfo() << endl << endl;
+
+    ss << "--- MÉMOIRE ---" << endl;
+    ss << "Mémoire totale: " << globalMemMon->getTotalMemory() / (1024*1024) << " MB" << endl;
+    ss << "Mémoire libre: " << globalMemMon->getFreeMemory() / (1024*1024) << " MB" << endl;
+    ss << "Utilisation mémoire: " << globalMemMon->getMemoryUsagePercentage() << "%" << endl;
+    ss << "Swap total: " << globalMemMon->getTotalSwap() / (1024*1024) << " MB" << endl;
+    ss << "Utilisation swap: " << globalMemMon->getSwapUsagePercentage() << "%" << endl << endl;
+
+    ss << "--- PROCESSUS ---" << endl;
+    ss << "Nombre de processus: " << globalProcMon->getNbrProcess() << endl;
+    ss << globalProcMon->getProcessInfo() << endl;
+    
+    return ss.str();
 }
 
-bool SysMon::update(){
-    CpuMonitor::update();
-    ProcessMonitor::update();
-    MemoryMonitor::update();
-    return true;
-}
-
-//function to get the current time for loggin.
-string SysMon::getTime()
-{
-    time_t timestamp;
-    time(&timestamp);
-    char* time = ctime(&timestamp);
-
-    if (time[strlen(time) - 1] == '\n')
-        time[strlen(time) - 1] = '\0';
-    return time;
-}
-
-// //Fetching required files '/proc/stat/' and '/proc/meminfo'.
-string SysMon::getInfo(string _file_path)
-{
-    string content;
-    stringstream content_stream;
-
-    fstream info(_file_path, ios::in);
-    if (!info)
-    {
-        cerr << "There was an error opening the file" << endl;
-        return " ";
+string exportAsCSV() {
+    if (!globalCpuMon || !globalMemMon || !globalProcMon) {
+        return "Erreur: Données de surveillance non initialisées";
     }
-    content_stream << info.rdbuf();
-    content = content_stream.str();
-    info.close();
-    return content;
+    
+    stringstream ss;
+    
+    ss << "Timestamp,CPU_Usage,CPU_Freq,Total_Memory_MB,Free_Memory_MB,Memory_Usage_Percent,";
+    ss << "Total_Swap_MB,Swap_Usage_Percent,Process_Count" << endl;
+    
+    ss << getTime() << ",";
+    ss << globalCpuMon->getCpuUsage() << ",";
+    ss << globalCpuMon->getCpuFreq() << ",";
+    ss << globalMemMon->getTotalMemory() / (1024*1024) << ",";
+    ss << globalMemMon->getFreeMemory() / (1024*1024) << ",";
+    ss << globalMemMon->getMemoryUsagePercentage() << ",";
+    ss << globalMemMon->getTotalSwap() / (1024*1024) << ",";
+    ss << globalMemMon->getSwapUsagePercentage() << ",";
+    ss << globalProcMon->getNbrProcess() << endl;
+    
+    return ss.str();
 }
 
-void SysMon::log(ostream &out)
-{
-    fstream logFile("log.txt", ios::app);
-    logFile << out.rdbuf();
-    logFile.close();
-}
-
-std::vector<std::string> getVector(std::istringstream &iss)
-{
-    int i = 0;
-    std::vector<std::string> info;
-    std::string content;
-    while (iss >> content && i < 13)
-    {
-        info.push_back(content);
-        i++;
+bool update(CpuMonitor cpuMon, MemoryMonitor memMon, ProcessMonitor procMon) {
+    bool success = true;
+    
+    globalCpuMon = &cpuMon;
+    globalMemMon = &memMon;
+    globalProcMon = &procMon;
+    
+ 
+    if (!cpuMon.update()) {
+        cerr << "Erreur lors de la mise à jour du moniteur CPU" << endl;
+        success = false;
     }
-
-    return info;
-}
-
-bool isNumber(std::string &string)
-{
-    bool isNumber = true;
-    for (auto str : string)
-    {
-        if (!std::isdigit(str))
-        {
-            isNumber = false;
-            break;
-        }
+    
+    if (!memMon.update()) {
+        cerr << "Erreur lors de la mise à jour du moniteur mémoire" << endl;
+        success = false;
     }
-    return isNumber;
+    
+    if (!procMon.update()) {
+        cerr << "Erreur lors de la mise à jour du moniteur processus" << endl;
+        success = false;
+    }
+    
+    return success;
 }
+
+string getTime() {
+    time_t now = time(0);
+    struct tm* timeinfo = localtime(&now);
+    
+    stringstream ss;
+    ss << put_time(timeinfo, "%Y-%m-%d %H:%M:%S");
+    return ss.str();
+}
+
+string getInfo() {
+    struct utsname sysInfo;
+    stringstream ss;
+    
+    if (uname(&sysInfo) == 0) {
+        ss << "Système: " << sysInfo.sysname << endl;
+        ss << "Version du noyau: " << sysInfo.release << endl;
+        ss << "Version: " << sysInfo.version << endl;
+        ss << "Architecture: " << sysInfo.machine << endl;
+        ss << "Nom d'hôte: " << sysInfo.nodename << endl;
+    } else {
+        ss << "Impossible de récupérer les informations système" << endl;
+    }
+    
+    return ss.str();
+}
+
