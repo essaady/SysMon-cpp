@@ -1,10 +1,17 @@
 #ifndef MEMORYMONITOR_H
 #define MEMORYMONITOR_H
 
+#include <iostream>
+
 class MemoryMonitor {
 public:
     MemoryMonitor();
-    double getUsedMemoryMB();
+    bool update();
+    void displayUsage();
+
+private:
+    double totalMemMb;
+    double usedMemMb;
 };
 
 #endif

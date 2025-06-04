@@ -3,22 +3,17 @@
 #include <string>
 #include <sstream>
 
-MemoryMonitor::MemoryMonitor() {
+MemoryMonitor::MemoryMonitor() : totalMemMb(0), usedMemMb(0) {}
 
-}
-
-double MemoryMonitor::getUsedMemoryMB() {
-    std::ifstream meminfo("/proc/meminfo");
-    if (!meminfo.is_open()) {
- 
-        return -1.0;
-    }
+bool MemoryMonitor::update() {
+    std::ifstream file("/proc/meminfo");
+    if (!file.is_open()) return false;
 
     std::string line;
-    long memTotalKB = 0;
-    long memFreeKB = 0;
+    long memTotal = 0;
+    long memFree = 0;
 
-    while (std::getline(meminfo, line)) {
+    while (std::getline(file, line)) {
         std::istringstream iss(line);
         std::string key;
         long value;
@@ -26,26 +21,20 @@ double MemoryMonitor::getUsedMemoryMB() {
 
         iss >> key >> value >> unit;
 
-        if (key == "MemTotal:") {
-            memTotalKB = value;
-        } else if (key == "MemFree:") {
-            memFreeKB = value;
-        }
+        if (key == "MemTotal:") memTotal = value;
+        else if (key == "MemFree:") memFree = value;
 
-  
-        if (memTotalKB > 0 && memFreeKB > 0) {
-            break;
-        }
+        if (memTotal && memFree) break;
     }
+    file.close();
 
-    meminfo.close();
+    if (memTotal == 0) return false;
 
-    if (memTotalKB == 0) {
-        return -1.0; 
-    }
+    totalMemMb = memTotal / 1024.0;
+    usedMemMb = (memTotal - memFree) / 1024.0;
+    return true;
+}
 
-    long usedKB = memTotalKB - memFreeKB;
-    double usedMB = usedKB / 1024.0; 
-
-    return usedMB;
+void MemoryMonitor::displayUsage() {
+    std::cout << "RAM Used: " << usedMemMb << " GB / " << totalMemMb << " GB" << std::endl;
 }
