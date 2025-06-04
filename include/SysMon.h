@@ -233,11 +233,11 @@ public:
                     std::cout << "=== CPU information ===" << std::endl;
                     std::cout << getInfo("cpu") << std::endl;
                     
-                    std::cout << "=== Memory information ===" << std::endl;
-                    std::cout << getInfo("memory") << std::endl;
+                    // std::cout << "=== Memory information ===" << std::endl;
+                    // std::cout << getInfo("memory") << std::endl;
                     
-                    std::cout << "=== process information ===" << std::endl;
-                    std::cout << getInfo("process") << std::endl;
+                    // std::cout << "=== process information ===" << std::endl;
+                    // std::cout << getInfo("process") << std::endl;
                     
                     std::cout << "────────────────────────────────────────────────────────────────────────────────" << std::endl;
                     std::cout << "Update interval: " << updateInterval << "  every " << (updateInterval / 1000) << " sec..." << std::endl;
