@@ -1,0 +1,30 @@
+name: SysMon C++ CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout du code
+      uses: actions/checkout@v3
+
+    - name: Installer les dépendances
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y g++ make cmake
+
+    - name: Créer les dossiers de build
+      run: mkdir -p build
+
+    - name: Compiler test_CpuMonitor.cpp
+      run: |
+        g++ -Iinclude src/CpuMonitor.cpp tests/test_CpuMonitor.cpp -o build/test_cpu
+
+    - name: Exécuter les tests CPU
+      run: ./build/test_cpu

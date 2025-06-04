@@ -1,31 +1,35 @@
 #ifndef MEMORYMONITOR_H
 #define MEMORYMONITOR_H
 
+#include <string>
+#include <vector>
+
 class MemoryMonitor {
 public:
-    MemoryMonitor();
-
-    // Met à jour les informations mémoire
-    void update();
-
-    // Renvoie la mémoire totale en Mo
-    double getTotalMemoryMB() const;
-
-    // Renvoie la mémoire utilisée en Mo
-    double getUsedMemoryMB() const;
-
-    // Renvoie le pourcentage d'utilisation de la mémoire
-    double getMemoryUsagePercent() const;
+    struct ram {
+        size_t totalMemInMb;
+        float usage;
+        float freeMem;
+        size_t SwapMeminMb;
+        float usageSwp;
+        float freeSwp;
+    } RAM;
 
 private:
-    unsigned long totalMemoryKB;
-    unsigned long freeMemoryKB;
-    unsigned long availableMemoryKB;
-    unsigned long buffersKB;
-    unsigned long cachedKB;
+    std::vector<std::string> memInfo;
 
-    // Lit les données depuis /proc/meminfo
-    void readMemInfo();
+public:
+    bool update();
+
+    unsigned long getTotalMemory();
+    unsigned long getFreeMemory();
+    unsigned long getUsedMemory();
+    double getMemoryUsagePercentage();
+
+    unsigned long getTotalSwap();
+    unsigned long getFreeSwap();
+    unsigned long getUsedSwap();
+    double getSwapUsagePercentage();
 };
 
-#endif // MEMORYMONITOR_H
+#endif 

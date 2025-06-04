@@ -1,45 +1,78 @@
-#include <iostream>
-#include <thread>
-#include <chrono>
-#include "CpuMonitor.h"
-#include "MemoryMonitor.h"
-#include "ProcessMonitor.h"
-using namespace std;
+#include "..\include\SysMon.h"
+#include <sstream>
+#include <iomanip>
+#include <ctime>
+#include <fstream>
 
-int main() {
-    CpuMonitor cpuMonitor;
-    MemoryMonitor memoryMonitor;
-    ProcessMonitor processMonitor;
+SysMon::SysMon(int interval, bool log) : updateInterval(interval), fullLog(log) {}
 
-    while (true) {
-        // Mettre à jour les statistiques
-        cpuMonitor.update();
-        memoryMonitor.update();
-        processMonitor.update();
+bool SysMon::update() {
+    bool cpuOk = cpuMonitor.update();
+    bool memOk = memoryMonitor.update();
+    bool procOk = processMonitor.update();
+    return cpuOk && memOk && procOk;
+}
 
-        // Afficher les résultats
-        cout << "\033[2J\033[1;1H"; // Clear console (ANSI escape code)
-        cout << "SysMon - System Monitor\n";
-        cout << "---------------------------------\n";
+std::string SysMon::getTime() {
+    std::time_t t = std::time(nullptr);
+    char buf[64];
+    std::strftime(buf, sizeof(buf), "%Y-%m-%d %H:%M:%S", std::localtime(&t));
+    return std::string(buf);
+}
 
-        // Afficher l'utilisation CPU
-        cout << "CPU Usage: " << cpuMonitor.getCpuUsage() << "%" << endl;
+std::string SysMon::getInfo(const std::string& type) {
+    if (type == "CPU") return cpuMonitor.getCpuInfo();
+    else if (type == "RAM") return std::to_string(memoryMonitor.getUsedMemory());
+    else if (type == "PROC") return processMonitor.getProcessInfo();
+    return "";
+}
 
-        // Afficher l'utilisation mémoire
-        cout << "Memory Usage: " << memoryMonitor.getMemoryUsagePercent() << "%"
-                  << " (" << memoryMonitor.getUsedMemoryMB() << " MB used / "
-                  << memoryMonitor.getTotalMemoryMB() << " MB total)\n";
+std::string SysMon::exportAsText() {
+    std::ostringstream oss;
+    oss << "[ " << getTime() << " ]\n\n";
+    oss << ">>> CPU <<<\n";
+    oss << "Utilisation : " << cpuMonitor.getCpuUsage() << " %\n";
+    oss << "Fréquence   : " << cpuMonitor.getCpuFreq() << " MHz\n\n";
 
-        // Afficher les processus
-        cout << "\nProcesses:\n";
-        cout << "---------------------------------\n";
-        for (const auto& proc : processMonitor.getProcesses()) {
-            cout << "PID: " << proc.pid << " | Name: " << proc.name << " | CPU: " << proc.cpuUsage << "% | MEM: " << proc.memoryUsageMB << " MB\n";
-        }
+    oss << ">>> MÉMOIRE <<<\n";
+    oss << "Total : " << memoryMonitor.getTotalMemory() << " MB\n";
+    oss << "Utilisée : " << memoryMonitor.getUsedMemory() << " MB (" 
+        << memoryMonitor.getMemoryUsagePercentage() << " %)\n";
+    oss << "Swap utilisée : " << memoryMonitor.getUsedSwap() << " MB\n\n";
 
-        // Attendre 1 seconde avant la prochaine mise à jour
-        this_thread::sleep_for(chrono::seconds(1));
+    oss << ">>> PROCESSUS ACTIFS <<<\n";
+    oss << processMonitor.getProcessInfo();
+
+    return oss.str();
+}
+
+std::string SysMon::exportAsCSV() {
+    std::ostringstream oss;
+    oss << "Time,CPU_Usage,CPU_Freq,Total_Mem,Used_Mem,Swap_Used\n";
+    oss << getTime() << ","
+        << cpuMonitor.getCpuUsage() << ","
+        << cpuMonitor.getCpuFreq() << ","
+        << memoryMonitor.getTotalMemory() << ","
+        << memoryMonitor.getUsedMemory() << ","
+        << memoryMonitor.getUsedSwap() << "\n";
+
+    return oss.str();
+}
+
+void SysMon::log() {
+    std::ofstream out("sysmon.log", std::ios::app);
+    if (out.is_open()) {
+        out << exportAsText() << "\n";
+        out.close();
     }
+}
 
+int SysMon::run() {
+    while (true) {
+        update();
+        std::cout << exportAsText() << std::endl;
+        if (fullLog) log();
+        std::this_thread::sleep_for(std::chrono::seconds(updateInterval));
+    }
     return 0;
 }

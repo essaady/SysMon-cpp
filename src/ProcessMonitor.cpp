@@ -1,129 +1,116 @@
-#ifdef _WIN32
+#include "../include/ProcessMonitor.h"
 #include <windows.h>
-#include <psapi.h>  // مكتبة للحصول على معلومات عن العمليات
-#else
-#include <unistd.h>
-#endif
-#include <dirent.h>
-#include <fstream>
+#include <psapi.h>
+#include <tlhelp32.h>
+#include <tchar.h>
+#include <sddl.h>
 #include <sstream>
-#include <cstring>
-#include <cstdlib>
-using namespace std;
+#include <vector>
+#include <string>
+#include <iostream>
 
-ProcessMonitor::ProcessMonitor() {
-    lastTotalCpuTime = getTotalCpuTime();
-}
+#pragma comment(lib, "psapi.lib")
+#pragma comment(lib, "advapi32.lib")
 
-void ProcessMonitor::update() {
-    readProcesses();
-}
 
-const vector<ProcessInfo>& ProcessMonitor::getProcesses() const {
-    return processes;
-}
 
-unsigned long long ProcessMonitor::getTotalCpuTime() const {
-    ifstream file("/proc/stat");
-    string line;
-    unsigned long long total = 0;
+bool ProcessMonitor::update() {
+    AP.clear();
 
-    if (file.is_open()) {
-        getline(file, line);
-        istringstream iss(line);
-        string cpu;
-        iss >> cpu;
+    HANDLE hSnapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+    if (hSnapshot == INVALID_HANDLE_VALUE) return false;
 
-        unsigned long long time;
-        while (iss >> time) {
-            total += time;
-        }
+    PROCESSENTRY32 pe32;
+    pe32.dwSize = sizeof(PROCESSENTRY32);
+
+    if (!Process32First(hSnapshot, &pe32)) {
+        CloseHandle(hSnapshot);
+        return false;
     }
 
-    return total;
-}
+    do {
+        ProcessMonitor::activeProcesses proc;
+        proc.cpu = 0.0f; 
+        proc.time = "N/A";
 
-void ProcessMonitor::readProcesses() {
-    processes.clear();
+        DWORD pid = pe32.th32ProcessID;
+        HANDLE hProcess = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, pid);
 
-    // معالجة للمعلومات حسب البيئة (Linux أو Windows)
-    #ifdef _WIN32
-        // الحصول على قائمة العمليات في Windows
-        DWORD aProcesses[1024], cbNeeded, cProcesses;
-        if (!EnumProcesses(aProcesses, sizeof(aProcesses), &cbNeeded)) {
-            return;
-        }
-        cProcesses = cbNeeded / sizeof(DWORD);
-
-        for (unsigned int i = 0; i < cProcesses; i++) {
-            DWORD pid = aProcesses[i];
-            HANDLE hProcess = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, pid);
-            if (hProcess == NULL) {
-                continue;
+        if (hProcess) {
+            TCHAR exePath[MAX_PATH];
+            if (GetModuleFileNameEx(hProcess, NULL, exePath, MAX_PATH)) {
+                proc.pathName = exePath;
+            } else {
+                proc.pathName = "Unknown";
             }
 
-            // جلب اسم العملية
-            TCHAR szProcessName[MAX_PATH] = TEXT("<unknown>");
-            GetModuleBaseName(hProcess, NULL, szProcessName, sizeof(szProcessName) / sizeof(TCHAR));
-            
-            // إضافة العملية إلى القائمة
-            processes.push_back({pid, szProcessName, 0.0, 0.0});  // قم بتحديد القيم الأخرى بناءً على احتياجك.
+            PROCESS_MEMORY_COUNTERS pmc;
+            if (GetProcessMemoryInfo(hProcess, &pmc, sizeof(pmc))) {
+                proc.memory = pmc.WorkingSetSize / (1024.0f * 1024.0f); // en MB
+            } else {
+                proc.memory = 0.0f;
+            }
+
+            HANDLE hToken;
+            if (OpenProcessToken(hProcess, TOKEN_QUERY, &hToken)) {
+                DWORD size = 0;
+                GetTokenInformation(hToken, TokenUser, NULL, 0, &size);
+                PTOKEN_USER tokenUser = (PTOKEN_USER)malloc(size);
+                if (GetTokenInformation(hToken, TokenUser, tokenUser, size, &size)) {
+                    LPSTR name = NULL;
+                    ConvertSidToStringSidA(tokenUser->User.Sid, &name);
+                    proc.user = name ? std::string(name) : "unknown";
+                    LocalFree(name);
+                } else {
+                    proc.user = "unknown";
+                }
+                free(tokenUser);
+                CloseHandle(hToken);
+            } else {
+                proc.user = "unknown";
+            }
+
             CloseHandle(hProcess);
-        }
-    #else
-        // كود Linux الحالي
-        DIR* dir = opendir("/proc");
-        struct dirent* entry;
-
-        unsigned long long currentTotalCpuTime = getTotalCpuTime();
-        unsigned long long totalDelta = currentTotalCpuTime - lastTotalCpuTime;
-        lastTotalCpuTime = currentTotalCpuTime;
-
-        while ((entry = readdir(dir)) != nullptr) {
-            if (!isdigit(entry->d_name[0])) continue;
-
-            int pid = atoi(entry->d_name);
-            string statPath = "/proc/" + string(entry->d_name) + "/stat";
-            ifstream statFile(statPath);
-
-            if (!statFile) continue;
-
-            string line;
-            getline(statFile, line);
-            istringstream iss(line);
-
-            string comm;
-            char state;
-            unsigned long utime, stime;
-            unsigned long vsize;
-            long rss;
-
-            int skip;
-            iss >> skip >> comm >> state;
-
-            // On avance jusqu’à utime (14ème champ)
-            for (int i = 0; i < 11; ++i) iss >> skip;
-            iss >> utime >> stime;
-
-            // On avance jusqu’à vsize et rss
-            for (int i = 0; i < 6; ++i) iss >> skip;
-            iss >> vsize >> rss;
-
-            // Nom du processus
-            string name = comm.substr(1, comm.size() - 2); // enlever les parenthèses
-
-            // Calcul du CPU utilisé (utime + stime)
-            unsigned long long procTime = utime + stime;
-
-            double cpuUsage = (totalDelta > 0) ? 100.0 * procTime / totalDelta : 0.0;
-
-            // Mémoire en Mo
-            long pageSizeKB = sysconf(_SC_PAGESIZE) / 1024;
-            double memUsageMB = rss * pageSizeKB / 1024.0;
-
-            processes.push_back({pid, name, cpuUsage, memUsageMB});
+        } else {
+            proc.pathName = "Access denied";
+            proc.memory = 0.0f;
+            proc.user = "unknown";
         }
 
-        closedir(dir);
-    #endif
+        AP.push_back(proc);
+
+    } while (Process32Next(hSnapshot, &pe32));
+
+    CloseHandle(hSnapshot);
+    nbrProcess = AP.size();
+    return true;
+}
+
+ProcessMonitor::activeProcesses ProcessMonitor::getProcess(int index) {
+    if (index < 0 || index >= (int)AP.size()) {
+        return {};
+    }
+    return AP[index];
+}
+
+std::string ProcessMonitor::getProcessInfo() {
+    std::ostringstream oss;
+    int index = 0;
+    for (const auto& proc : AP) {
+        oss << "Process " << index++ << ":\n";
+        oss << "  User: " << proc.user << "\n";
+        oss << "  CPU Usage: " << proc.cpu << " s\n";
+        oss << "  Memory: " << proc.memory << " MB\n";
+        oss << "  Path: " << proc.pathName << "\n";
+        oss << "  Time: " << proc.time << "\n\n";
+    }
+    return oss.str();
+}
+
+std::string ProcessMonitor::getProcessRaw() {
+    std::ostringstream oss;
+    for (const auto& proc : AP) {
+        oss << proc.user << "," << proc.cpu << "," << proc.memory << "," << proc.pathName << "," << proc.time << "\n";
+    }
+    return oss.str();
 }

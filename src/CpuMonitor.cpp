@@ -1,58 +1,121 @@
-#include "CpuMonitor.h"
+#include "..\include\CpuMonitor.h"
+
+#ifdef _WIN32
+
+#include <windows.h>
 #include <fstream>
 #include <sstream>
-using namespace std;
+#include <string>
+#include <vector>
 
+bool CpuMonitor::update() {
 
-CpuMonitor::CpuMonitor() {
-    prevTimes = readCpuTimes();
+    static long counter = 0;
+    CPU.usageCPU = 20.0f + (counter++ % 50);
+    CPU.nbrCPU = GetSystemInfoWrapper();
+    CPU.frequency = 2400.0f;   
+    CPU.frequencyMax = 3200.0f; 
+    rawCPU = "Simulated CPU data";
+    return true;
 }
 
-// Lit les temps CPU depuis /proc/stat
-CpuMonitor::CpuTimes CpuMonitor::readCpuTimes() const {
-    ifstream file("/proc/stat");
-    string line;
-    CpuTimes times = {};
+int CpuMonitor::GetSystemInfoWrapper() {
+    SYSTEM_INFO sysinfo;
+    GetSystemInfo(&sysinfo);
+    return static_cast<int>(sysinfo.dwNumberOfProcessors);
+}
 
+float CpuMonitor::getCpuUsage() {
+    return CPU.usageCPU;
+}
+
+float CpuMonitor::getCpuFreq() {
+    return CPU.frequency;
+}
+
+std::string CpuMonitor::getCpuInfo() {
+    std::ostringstream oss;
+    oss << "CPU Usage: " << CPU.usageCPU << "%\n"
+        << "Frequency: " << CPU.frequency << " MHz\n"
+        << "Cores: " << CPU.nbrCPU;
+    return oss.str();
+}
+
+#else  // LINUX
+
+#include <unistd.h>
+#include <fstream>
+#include <sstream>
+#include <string>
+#include <vector>
+
+bool CpuMonitor::update() {
+    std::ifstream file("/proc/stat");
+    if (!file.is_open()) return false;
+
+    std::string line;
+    std::getline(file, line); 
+
+    std::istringstream iss(line);
+    std::string cpuLabel;
+    long user, nice, system, idle, iowait, irq, softirq, steal;
+    iss >> cpuLabel >> user >> nice >> system >> idle >> iowait >> irq >> softirq >> steal;
+
+    long idleTime = idle + iowait;
+    long totalTime = user + nice + system + idleTime + irq + softirq + steal;
+
+    static long prevIdle = 0, prevTotal = 0;
+    long deltaIdle = idleTime - prevIdle;
+    long deltaTotal = totalTime - prevTotal;
+
+    if (deltaTotal == 0) return false;
+
+    CPU.usageCPU = 100.0f * (1.0f - (float)deltaIdle / deltaTotal);
+    prevIdle = idleTime;
+    prevTotal = totalTime;
+
+    CPU.nbrCPU = sysconf(_SC_NPROCESSORS_ONLN);
+    CPU.frequency = getCurrentCpuFreq();
+    CPU.frequencyMax = getMaxCpuFreq();
+
+    rawCPU = line;
+    return true;
+}
+
+float CpuMonitor::getCpuUsage() {
+    return CPU.usageCPU;
+}
+
+float CpuMonitor::getCpuFreq() {
+    return CPU.frequency;
+}
+
+std::string CpuMonitor::getCpuInfo() {
+    std::ostringstream oss;
+    oss << "CPU Usage: " << CPU.usageCPU << "%\n"
+        << "Frequency: " << CPU.frequency << " MHz\n"
+        << "Cores: " << CPU.nbrCPU;
+    return oss.str();
+}
+
+float CpuMonitor::getCurrentCpuFreq() {
+    std::ifstream file("/sys/devices/system/cpu/cpu0/cpufreq/scaling_cur_freq");
+    float freq = 0.0f;
     if (file.is_open()) {
-        getline(file, line);
-        istringstream iss(line);
-
-        string cpuLabel;
-        iss >> cpuLabel; // "cpu"
-
-        iss >> times.user >> times.nice >> times.system >> times.idle
-            >> times.iowait >> times.irq >> times.softirq >> times.steal;
+        file >> freq;
+        freq /= 1000.0f;
     }
-
-    return times;
+    return freq;
 }
 
-void CpuMonitor::update() {
-    prevTimes = currentTimes;
-    currentTimes = readCpuTimes();
+float CpuMonitor::getMaxCpuFreq() {
+    std::ifstream file("/sys/devices/system/cpu/cpu0/cpufreq/cpuinfo_max_freq");
+    float freq = 0.0f;
+    if (file.is_open()) {
+        file >> freq;
+        freq /= 1000.0f;
+    }
+    return freq;
 }
 
-double CpuMonitor::getCpuUsage() const {
-    unsigned long long prevIdle = prevTimes.idleAll();
-    unsigned long long currIdle = currentTimes.idleAll();
-
-    unsigned long long prevTotal = prevTimes.total();
-    unsigned long long currTotal = currentTimes.total();
-
-    unsigned long long totalDelta = currTotal - prevTotal;
-    unsigned long long idleDelta = currIdle - prevIdle;
-
-    if (totalDelta == 0) return 0.0;
-
-    return 100.0 * (1.0 - static_cast<double>(idleDelta) / totalDelta);
-}
-
-// Calcule le temps total (user + nice + system + idle + ...)
-unsigned long long CpuMonitor::CpuTimes::total() const {
-    return user + nice + system + idle + iowait + irq + softirq + steal;
-}
-
-unsigned long long CpuMonitor::CpuTimes::idleAll() const {
-    return idle + iowait;
-}
+#endif

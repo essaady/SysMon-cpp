@@ -4,24 +4,29 @@
 #include "CpuMonitor.h"
 #include "MemoryMonitor.h"
 #include "ProcessMonitor.h"
+#include <string>
+#include <iostream>
+#include <thread>
+#include <chrono>
 
-// Classe SysMon qui regroupe tous les moniteurs
 class SysMon {
 public:
-    SysMon();
-    
-    // Met à jour tous les moniteurs
-    void update();
+    SysMon(int interval = 2, bool log = false);
 
-    // Renvoie les moniteurs
-    CpuMonitor& getCpuMonitor();
-    MemoryMonitor& getMemoryMonitor();
-    ProcessMonitor& getProcessMonitor();
+    bool update();
+    std::string getTime();
+    std::string getInfo(const std::string& type);
+    std::string exportAsText();
+    std::string exportAsCSV();
+    void log();
+    int run();
 
 private:
+    int updateInterval;
+    bool fullLog;
     CpuMonitor cpuMonitor;
     MemoryMonitor memoryMonitor;
     ProcessMonitor processMonitor;
 };
 
-#endif // SYSMON_H
+#endif
