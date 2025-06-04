@@ -1,39 +1,15 @@
 #pragma once
-#ifndef _PROCESSMONITOR_H
-#define _PROCESSMONITOR_H
+#ifndef _PROC_H
+#define _PROC_H
 
-#include <vector>
-#include <string>
-#include <sstream>
+#include "../include/SysMon.h"
+#include <filesystem>
 
-typedef struct ap{
-    float cpu;
-    float memory;
-    struct time;
-    std::string user;
-    std::string pathName;
-} activeProcesses;
+class ProcMon : public SysMon{
 
-
-
-class ProcessMonitor{
-protected:
-    activeProcesses AP;
-    int nbrProcess;
 
 public:
-    
-    ProcessMonitor();
-
-    ~ProcessMonitor();
-
-    bool update();
-
-    activeProcesses getProcess(int);
-    
-    std::string getProcessInfo();
-
-    std::string getProcessRaw();
+    void getProcess();
 
 };
 
