@@ -1,43 +1,13 @@
-#include "../include/SysMon.h"
+#include <iostream>
+#include "CpuMonitor.h"
 
+int main() {
+    CpuMonitor monitor;
+    monitor.update();
 
-int main(int argc, char *argv[])
-{
+    std::cout << monitor.getCpuInfo() << std::endl;
+    std::cout << "Usage CPU global : " << monitor.getCpuUsage() << "%" << std::endl;
+    std::cout << "Fréquence actuelle : " << monitor.getCpuFreq() << " GHz" << std::endl;
 
-    // clear the screen on start
-    system("clear");
-    vector<string> options = {"--help", "--update", "--export"};
-    // checking for user argument
-    int option = 0;
-    if (argc >= 2)
-    {
-        bool isReconized = false;
-        for (auto param : options)
-        {
-            char *argument = new char[param.length() + 1];
-            strcpy(argument, param.c_str());
-            if (!strcmp(argv[1], argument))
-            {
-                std::cout << param << " Called\n";
-                isReconized = true;
-                break;
-            }
-        }
-        if (!isReconized)
-        {
-            std::cout << "'" << argv[1] << "' command not reconigzed\n";
-            exit(-1);
-        }
-
-        if (!strcmp(argv[1], "--export"))
-        {
-            option = options::_NLOG;
-        }
-    }
-    
-    int updateInterval = 5e5;
-    
-    SysMon SysMonCpp(updateInterval);
-
-    return SysMonCpp.run();
+    return 0;
 }

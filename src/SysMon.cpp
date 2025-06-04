@@ -1,3 +1,4 @@
+
 #include "../include/SysMon.h"
 #include <unistd.h>
 #include <fstream>
@@ -100,3 +101,4 @@ bool isNumber(std::string &string)
     }
     return isNumber;
 }
+

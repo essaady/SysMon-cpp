@@ -1,3 +1,4 @@
+
 #pragma once
 #ifndef _MEMORYMONITOR_H
 #define _MEMORYMONITOR_H
@@ -47,3 +48,4 @@ public:
 };
 
 #endif
+
