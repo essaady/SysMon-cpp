@@ -2,6 +2,7 @@
 #include <thread> //pour utiliser std::this_thread::sleep_for() (mise en pause du programme)
 #include <chrono> // pour utiliser chrono dans sleep_for
 #include "../include/MemoryMonitor.h"
+#include "../include/CpuMonitor.h"
 #include <iomanip>  //pour setprecision et fixed, voir https://devdocs.io/cpp/io/manip/setprecision et https://devdocs.io/cpp/io/manip/fixed
 
 using namespace std;
@@ -26,7 +27,7 @@ int main() {
             const double totalRAM = memMonitor.getTotalMemory() / (1024.0 * 1024.0);
             const double usedRAM = memMonitor.getUsedMemory() / (1024.0 * 1024.0);
             const double freeRAM = memMonitor.getFreeMemory() / (1024.0 * 1024.0);
-            
+
             //affichage de la ram
             cout << "___RAM___" << endl;
             cout << "Total RAM:    " << totalRAM << " GB" << endl;
@@ -38,7 +39,7 @@ int main() {
             const double totalSwap = memMonitor.getTotalSwap() / (1024.0 * 1024.0);
             const double usedSwap = memMonitor.getUsedSwap() / (1024.0 * 1024.0);
             const double freeSwap = memMonitor.getFreeSwap() / (1024.0 * 1024.0);
-            
+
             //affichage swap
             if (totalSwap > 0) {
                 cout << "___SWAP___" << endl;
@@ -54,6 +55,15 @@ int main() {
 
         //attendre 2 secondes avant la prochaine mise a jour
         this_thread::sleep_for(chrono::seconds(2)); //l'utilisation de la fct chrono est naicessaire, voir la documentaion de la fct std::this_thread::sleep_for en https://devdocs.io/cpp/thread/sleep_for    }
+        
+        
+        //_____CpuMonitor_____
+        
+        CpuMonitor monitor;
+        monitor.update();
+        cout << "___CPU INFO___" << endl;
+        cout << monitor.getCpuInfo() << endl;
+        
 
     return 0;
 }
