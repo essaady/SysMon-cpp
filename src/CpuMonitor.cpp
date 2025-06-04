@@ -1,12 +1,24 @@
-#include "CpuMonitor.h"
+#include "../include/CpuMonitor.h"
 #include <fstream>
 #include <sstream>
 #include <thread>
 #include <chrono>
 #include <iostream>
+using namespace std;
 
-CpuMonitor::CpuMonitor() : firstRead(true) {}
+// Constructeur
+CpuMonitor::CpuMonitor() : firstRead(true) {
+    // Initialisation des ressources CPU
+    CPU.frequencyMax = 0; // À implémenter
+    CPU.nbrCPU = 0;        // À implémenter
+}
 
+// Destructeur
+CpuMonitor::~CpuMonitor() {
+    // Libération des ressources si nécessaire
+}
+
+// Lit les stats depuis /proc/stat
 bool CpuMonitor::readCpuStats(std::vector<unsigned long long>& stats) {
     std::ifstream file("/proc/stat");
     if (!file.is_open()) {
@@ -26,38 +38,37 @@ bool CpuMonitor::readCpuStats(std::vector<unsigned long long>& stats) {
             while (ss >> value) {
                 stats.push_back(value);
             }
-            return true; // lu la ligne cpu globale et on sort
+            return true;
         }
     }
     return false;
 }
 
-double CpuMonitor::getCpuUsage() {
+// Méthode principale pour calculer l'utilisation du CPU
+float CpuMonitor::getCpuUsage() {
     std::vector<unsigned long long> currentStats;
 
     if (!readCpuStats(currentStats)) {
-        return -1.0;
+        return -1.0f;
     }
 
     if (firstRead) {
         prevStats = currentStats;
         firstRead = false;
-        // On attend un peu avant la prochaine lecture
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
         if (!readCpuStats(currentStats)) {
-            return -1.0;
+            return -1.0f;
         }
     }
 
-    // Calcul de l'utilisation CPU
-    unsigned long long prevIdle = prevStats[3] + prevStats[4]; // idle + iowait
+    unsigned long long prevIdle = prevStats[3] + prevStats[4];
     unsigned long long idle = currentStats[3] + currentStats[4];
 
     unsigned long long prevNonIdle = 0;
     unsigned long long nonIdle = 0;
 
     for (size_t i = 0; i < prevStats.size(); ++i) {
-        if (i != 3 && i != 4) { // ce qui n'est pas idle ni iowait
+        if (i != 3 && i != 4) {
             prevNonIdle += prevStats[i];
             nonIdle += currentStats[i];
         }
@@ -71,8 +82,26 @@ double CpuMonitor::getCpuUsage() {
 
     prevStats = currentStats;
 
-    if (totald == 0) return 0.0;
+    if (totald == 0) return 0.0f;
 
-    double cpuPercentage = (double)(totald - idled) / totald * 100.0;
-    return cpuPercentage;
+    return (float)(totald - idled) / totald * 100.0f;
+}
+
+// Mise à jour globale
+bool CpuMonitor::update() {
+    // À implémenter plus tard
+    // CPU.usageCPU = getCpuUsage();
+    // CPU.frequency = getCpuFreq();
+    // rawCPU = getCpuInfo();
+    return true;
+}
+
+// Obtenir la fréquence CPU (à implémenter)
+float CpuMonitor::getCpuFreq() {
+    return 0.0f;
+}
+
+// Obtenir les infos CPU (à implémenter)
+std::string CpuMonitor::getCpuInfo() {
+    return "";
 }
