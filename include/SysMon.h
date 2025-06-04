@@ -240,7 +240,7 @@ public:
                     std::cout << getInfo("process") << std::endl;
                     
                     std::cout << "────────────────────────────────────────────────────────────────────────────────" << std::endl;
-                    std::cout << "Update interval: " << updateInterval << "every 1 sec..." << std::endl;
+                    std::cout << "Update interval: " << updateInterval << "  every " << (updateInterval / 1000) << " sec..." << std::endl;
                 
                 
                     std::this_thread::sleep_for(std::chrono::milliseconds(updateInterval));
