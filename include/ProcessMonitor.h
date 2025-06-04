@@ -26,8 +26,11 @@ public:
     
     bool update();
     AP getProcess(int index);
+    int getProcessNbr();
     string getProcessInfo();
     string getProcessRaw();
+
+    string getALLProcessInfo();
     
     ~ProcessMonitor();
 };

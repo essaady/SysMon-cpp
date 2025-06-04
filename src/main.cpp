@@ -26,8 +26,25 @@ void parseArguments(int argc, char* argv[]) {
             sysMon.setUpdateInterval(atoi(argv[++i]));
         }
         else if (strcmp(argv[i], "--export") == 0) {
-            sysMon.exportAsText();
-            sysMon.exportAsCSV();
+            if (i + 1 < argc && argv[i + 1][0] != '-') {
+                sysMon.setExportPath(argv[++i]);
+            }
+            
+            cout << "Exporting system data..." << endl;
+            cout << "Export path: " << sysMon.getExportPath() << endl;
+            
+            bool textSuccess = sysMon.exportAsText();
+            bool csvSuccess = sysMon.exportAsCSV();
+            
+            if (textSuccess && csvSuccess) {
+                cout << "Export completed successfully!" << endl;
+            } else {
+                cout << "Export completed with errors." << endl;
+                if (!textSuccess) cout << "Failed to export text report." << endl;
+                if (!csvSuccess) cout << "Failed to export CSV data." << endl;
+            }
+            
+            exit(textSuccess && csvSuccess ? 0 : 1);
         }
     }
 }

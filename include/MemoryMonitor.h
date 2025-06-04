@@ -21,7 +21,7 @@ public:
     MemoryMonitor();
     
     bool update();
-    
+
     unsigned long long getTotalMemory();
     unsigned long long getFreeMemory();
     unsigned long long getUsedMemory();
@@ -33,6 +33,8 @@ public:
     unsigned long long getUsedSwap();
 
     double getSwapUsagePercentage();
+
+    string getMemoryInfo();
 
     ~MemoryMonitor();
 };

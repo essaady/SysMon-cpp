@@ -19,8 +19,10 @@ public:
     CpuMonitor();
     
     bool update();
+    float getCpuNbr();
     float getCpuUsage();
     float getCpuFreq();
+    float getCpuFreqMax();
     string getCpuInfo();
 
     ~CpuMonitor();

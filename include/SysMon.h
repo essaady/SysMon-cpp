@@ -11,11 +11,15 @@
 #include <sstream>
 #include <iomanip>
 #include <ctime>
+#include <fstream>
+#include <iostream>
 
 class SysMonitor : public CpuMonitor, public MemoryMonitor, public ProcessMonitor {
 private:
     int updateInterval; 
     bool fullLog; 
+    std::string exportPath;
+
 
     std::string getTime() {
         auto now = std::chrono::system_clock::now();
@@ -24,6 +28,14 @@ private:
         ss << std::put_time(std::localtime(&time), "%Y-%m-%d %H:%M:%S");
         return ss.str();
     }
+    std::string getTimeForFilename() {
+        auto now = std::chrono::system_clock::now();
+        auto time = std::chrono::system_clock::to_time_t(now);
+        std::stringstream ss;
+        ss << std::put_time(std::localtime(&time), "%Y%m%d_%H%M%S");
+        return ss.str();
+    }
+
     void clearScreen() {
         #ifdef _WIN32
             system("cls");
@@ -55,6 +67,17 @@ public:
         return updateInterval ;
     }
 
+    void setExportPath(const std::string& path) {
+        exportPath = path;
+        if (!exportPath.empty() && exportPath.back() != '/' && exportPath.back() != '\\') {
+            exportPath += "/";
+        }
+    }
+
+    std::string getExportPath() {
+        return exportPath;
+    }
+
     void setFullLogging(bool enable) {
         fullLog = enable;
     }
@@ -73,23 +96,127 @@ public:
             return getCpuInfo();
         }
         else if (type == "memory") {
-            return "Memory Usage: " + std::to_string(getMemoryUsagePercentage()) + "% "
-                    + "||||||" +
-                   "Swap Usage: " + std::to_string(getSwapUsagePercentage()) + "%\n";
+            return getMemoryInfo();
         }
         else if (type == "process") {
-            return "Proc info : " + getProcessInfo() + 
-                   "\nProc raw: " + getProcessRaw();
+            return getALLProcessInfo();
         }
         return "Unknown info type";
     }
 
-    std::string exportAsText() {
-        return "";
+    std::string generateTextReport() {
+        std::stringstream ss;
+        ss << "=== System Monitor Report ===\n";
+        ss << "Time: " << getTime() << "\n\n";
+        ss << "--- CPU Information ---\n" << getInfo("cpu") << "\n";
+        ss << "--- Memory Information ---\n" << getInfo("memory") << "\n";
+        ss << "--- Process Information ---\n" << getInfo("process") << "\n";
+        return ss.str();
     }
 
-    std::string exportAsCSV() {
-        return "";
+    std::string generateCSVReport() {
+    std::stringstream ss;
+    
+    
+    std::string cpuInfo = getInfo("cpu");
+    std::string memInfo = getInfo("memory");
+    std::string procInfo = getInfo("process");
+    
+
+    ss << "Timestamp,"
+       << "CPU Usage (%),"
+       << "CPU Frequency (MHz),"
+       << "CPU Max Frequency (MHz),"
+       << "Number of CPUs,"
+       << "Memory Usage (%),"
+       << "Memory Used (Bytes),"
+       << "Memory Free (Bytes),"
+       << "Memory Total (Bytes),"
+       << "Memory Used (GB),"
+       << "Memory Total (GB),"
+       << "Swap Usage (%),"
+       << "Swap Used (Bytes),"
+       << "Swap Free (Bytes),"
+       << "Swap Total (Bytes),"
+       << "Swap Used (GB),"
+       << "Swap Total (GB),"
+       << "Number of Processes,"
+       << "CPU Info (Full),"
+       << "Memory Info (Full),"
+       << "Process Info (Full)\n";
+    
+
+    double memUsedGB = getUsedMemory() / (1024.0 * 1024.0 * 1024.0);
+    double memTotalGB = getTotalMemory() / (1024.0 * 1024.0 * 1024.0);
+    double swapUsedGB = getUsedSwap() / (1024.0 * 1024.0 * 1024.0);
+    double swapTotalGB = getTotalSwap() / (1024.0 * 1024.0 * 1024.0);
+    
+
+    ss << getTime() << ","
+       << getCpuUsage() << ","
+       << getCpuFreq() << ","
+       << getCpuFreqMax() << "," 
+       << getCpuNbr()<< "," 
+       << getMemoryUsagePercentage() << ","
+       << getUsedMemory() << ","
+       << getFreeMemory() << ","
+       << getTotalMemory() << ","
+       << memUsedGB << ","
+       << memTotalGB << ","
+       << getSwapUsagePercentage() << ","
+       << getUsedSwap() << ","
+       << getFreeSwap() << ","
+       << getTotalSwap() << ","
+       << swapUsedGB << ","
+       << swapTotalGB << ","
+       << getProcessNbr() << ","
+       << cpuInfo << ","
+       << memInfo << ","
+       << procInfo << "\n";
+    
+    return ss.str();
+}
+
+    bool exportAsText() {
+        if (!update()) {
+            std::cerr << "Error: Failed to update system information before export" << std::endl;
+            return false;
+        }
+
+        std::string filename = exportPath + "sysmon_report_" + getTimeForFilename() + ".txt";
+        std::ofstream file(filename);
+        
+        if (!file.is_open()) {
+            std::cerr << "Error: Cannot create file " << filename << std::endl;
+            return false;
+        }
+
+        file << generateTextReport();
+        file.close();
+
+        std::cout << "Text report exported to: " << filename << std::endl;
+        return true;
+    }
+
+    bool exportAsCSV() {
+        if (!update()) {
+            std::cerr << "Error: Failed to update system information before export" << std::endl;
+            return false;
+        }
+
+        std::string filename = exportPath + "sysmon_data_" + getTimeForFilename() + ".csv";
+        std::ofstream file(filename);
+        
+        if (!file.is_open()) {
+            std::cerr << "Error: Cannot create file " << filename << std::endl;
+            return false;
+        }
+
+        file << generateCSVReport();
+        file.close();
+
+        std::cout << "CSV data exported to: " << filename << std::endl;
+        return true;
     }
 
 
