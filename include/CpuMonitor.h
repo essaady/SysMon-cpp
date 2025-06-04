@@ -2,18 +2,11 @@
 #define CPUMONITOR_H
 
 class CpuMonitor {
-    struct CPU {
-        short nbrCPU;
-        float* usagePerCPU;
-        float frequency;
-        float frequencyMax;
-    } CPU;
-
 public:
-    bool update();
-    float getCpuUsage();
-    float getCpuFreq();
-    float getCpuInfo();
+    CpuMonitor();               // constructeur par défaut
+    float getCpuUsage();        // retourne l'utilisation du CPU
 };
 
-#endif
+#endif 
+
+

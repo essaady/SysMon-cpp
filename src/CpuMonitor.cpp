@@ -1,6 +1,10 @@
 #include "CpuMonitor.h"
 
-bool CpuMonitor::update() { return true; }
-float CpuMonitor::getCpuUsage() { return 0.0f; }
-float CpuMonitor::getCpuFreq() { return 0.0f; }
-float CpuMonitor::getCpuInfo() { return 0.0f; }
+CpuMonitor::CpuMonitor() {
+    // Constructeur vide pour l'instant
+}
+
+float CpuMonitor::getCpuUsage() {
+    // Retourne une valeur fictive pour l'instant
+    return 0.0f;
+}
