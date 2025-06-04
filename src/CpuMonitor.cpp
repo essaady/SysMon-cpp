@@ -22,17 +22,37 @@ CpuMonitor::~CpuMonitor() {
 }
 
 bool CpuMonitor::update(){
-    //To-Do
-    // CPU.usageCPU  = getCpuUsage(); 
-    // CPU.frequency = getCpuFreq(); 
-    // rawCPU = getCpuInfo();
+    CPU.frequency = getCpuFreq();
     return true;
 }
 
-float CpuMonitor::getCpuFreq(){
-    //To-Do
-    return 0.0;
+float CpuMonitor::getCpuFreq(){ 
+    std:: ifstream cpuinfo_file("/proc/cpuinfo");
+    std::string line;
+    float frequency = 0.0f;
+    if (cpuinfo_file.is_open()) {
+        while (std::getline(cpuinfo_file, line)) {
+            
+            if (line.rfind("cpu MHz", 0) == 0) { 
+                std::istringstream iss(line);
+                std::string key;
+                iss >> key; // Read "cpu"
+                iss >> key; // Read "MHz"
+                iss >> key; // Read ":"
+                iss >> frequency; // Read the frequency value
+                break; // Found it, no need to read further
+            }
+        }
+        cpuinfo_file.close();
+    } else {
+        // Handle error: file could not be opened
+        std::cerr << "Error: Could not open /proc/cpuinfo to get CPU frequency." << std::endl;
+    }
+
+    return frequency;
 }
+
+//daba ghade nchofo kifaach t extracti cpu freq mn system linux 
 
 std::string CpuMonitor::getCpuInfo(){
     //To-Do
