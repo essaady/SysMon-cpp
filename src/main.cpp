@@ -1,17 +1,43 @@
-#include <iostream>
-#include <chrono>   // for std::chrono::seconds
-#include <thread>   // for std::this_thread::sleep_for
+#include "../include/SysMon.h"
 
-void displayInfo() {
-    // Put your code here to display updated information
-    std::cout << "Updating info..." << std::endl;
-}
 
-int main() {
-    while (true) {
-        system("clear");
-        displayInfo();
-        std::this_thread::sleep_for(std::chrono::seconds(2));
+int main(int argc, char *argv[])
+{
+
+    // clear the screen on start
+    system("clear");
+    vector<string> options = {"--help", "--update", "--export"};
+    // checking for user argument
+    int option = 0;
+    if (argc >= 2)
+    {
+        bool isReconized = false;
+        for (auto param : options)
+        {
+            char *argument = new char[param.length() + 1];
+            strcpy(argument, param.c_str());
+            if (!strcmp(argv[1], argument))
+            {
+                std::cout << param << " Called\n";
+                isReconized = true;
+                break;
+            }
+        }
+        if (!isReconized)
+        {
+            std::cout << "'" << argv[1] << "' command not reconigzed\n";
+            exit(-1);
+        }
+
+        if (!strcmp(argv[1], "--export"))
+        {
+            option = options::_NLOG;
+        }
     }
-    return 0;
+    
+    int updateInterval = 5e5;
+    
+    SysMon SysMonCpp(updateInterval);
+
+    return SysMonCpp.run();
 }
