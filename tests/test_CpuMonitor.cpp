@@ -151,8 +151,7 @@ void testCpuMeasurement(CpuMonitorTester& tester) {
         assert(formatted.find("CPU:") != string::npos);
     });
 }
-
-// Tests de monitoring
+//Tests de monitoring
 void testMonitoring(CpuMonitorTester& tester) {
     cout << "\n⚡ === TESTS MONITORING ===" << endl;
     

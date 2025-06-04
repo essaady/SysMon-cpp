@@ -278,7 +278,7 @@ int main() {
             default:
                 cout << "❌ Choix invalide!" << endl;
         }
-
+        
         // Pause avant retour au menu (sauf pour surveillance temps réel et quitter)
         if (choice != 0 && choice != 1) {
             cout << "\n📱 Appuyez sur Entrée pour continuer...";

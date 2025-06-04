@@ -6,6 +6,7 @@
 
 using namespace std;
 
+
 // Constructeur par défaut
 CpuMonitor::CpuMonitor()
     : currentUsage(0.0), previousIdle(0), previousTotal(0),
