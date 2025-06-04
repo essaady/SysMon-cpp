@@ -4,6 +4,7 @@
 #include <sstream>
 #include <thread>
 #include <chrono>
+#include <vector>
 
 CpuMonitor::CpuMonitor() {
     CPU.nbrCPU = 0;
@@ -14,25 +15,82 @@ CpuMonitor::CpuMonitor() {
 }
 
 bool CpuMonitor::update() {
-    // delete prev allocation if it exist
+    // Free previously allocated memory
     if (CPU.usagePerCPU != nullptr) {
         delete[] CPU.usagePerCPU;
         CPU.usagePerCPU = nullptr;
     }
-    
-    // Set new values
-    CPU.nbrCPU = 5;
-    CPU.usagePerCPU = new float[CPU.nbrCPU];
-    
-    for (int i = 0; i < CPU.nbrCPU; i++) {
-        CPU.usagePerCPU[i] = 10.0f + (i * 8.0f); // Example: 10%, 18%, 26%, 34%, 42%
+
+    std::ifstream statFile("/proc/stat");
+    if (!statFile.is_open()) {
+        std::cerr << "Failed to open /proc/stat" << std::endl;
+        return false;
     }
-    
-    CPU.usageCPU = 55.0f;
-    CPU.frequency = 65.0f;
-    CPU.frequencyMax = 455.10f;
-    
-    return true; 
+
+    std::vector<float> usage;
+    std::string line;
+    float totalUsage = 0.0f;
+    int cpuCount = 0;
+
+    while (std::getline(statFile, line)) {
+        if (line.substr(0, 3) == "cpu") {
+            std::istringstream ss(line);
+            std::string cpuLabel;
+            ss >> cpuLabel;
+            if (cpuLabel == "cpu") continue; // skip the aggregated line for now
+
+            unsigned long user, nice, system, idle, iowait, irq, softirq, steal;
+            ss >> user >> nice >> system >> idle >> iowait >> irq >> softirq >> steal;
+
+            unsigned long idleTime = idle + iowait;
+            unsigned long nonIdleTime = user + nice + system + irq + softirq + steal;
+            unsigned long totalTime = idleTime + nonIdleTime;
+
+            float cpuUsage = (float)nonIdleTime / totalTime * 100.0f;
+            usage.push_back(cpuUsage);
+            totalUsage += cpuUsage;
+            cpuCount++;
+        }
+    }
+
+    statFile.close();
+
+    CPU.nbrCPU = cpuCount;
+    CPU.usagePerCPU = new float[cpuCount];
+    for (int i = 0; i < cpuCount; ++i) {
+        CPU.usagePerCPU[i] = usage[i];
+    }
+    CPU.usageCPU = totalUsage / cpuCount;
+
+    // Get current frequency
+    std::ifstream freqFile("/proc/cpuinfo");
+    if (freqFile.is_open()) {
+        float sumFreq = 0.0f;
+        int count = 0;
+        while (std::getline(freqFile, line)) {
+            if (line.find("cpu MHz") != std::string::npos) {
+                float mhz;
+                sscanf(line.c_str(), "cpu MHz : %f", &mhz);
+                sumFreq += mhz;
+                count++;
+            }
+        }
+        if (count > 0) {
+            CPU.frequency = sumFreq / count;
+        }
+        freqFile.close();
+    }
+
+    // Get max frequency from first CPU
+    std::ifstream maxFreqFile("/sys/devices/system/cpu/cpu0/cpufreq/cpuinfo_max_freq");
+    if (maxFreqFile.is_open()) {
+        int maxKHz;
+        maxFreqFile >> maxKHz;
+        CPU.frequencyMax = maxKHz / 1000.0f; // Convert to MHz
+        maxFreqFile.close();
+    }
+
+    return true;
 }
 
 float CpuMonitor::getCpuNbr() {
