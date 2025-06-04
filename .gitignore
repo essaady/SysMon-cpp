@@ -30,3 +30,23 @@
 *.exe
 *.out
 *.app
+
+# Text files
+*.txt
+
+# Swap files
+*.swp
+
+#temporary files
+.tmp
+
+# folders
+.vscode/
+build/
+CMakeLists.txt
+
+# Text files
+*.txt
+
+# Swap files
+*.swp
