@@ -1,32 +1,85 @@
-# Prerequisites
-*.d
-
-# Compiled Object files
-*.slo
-*.lo
-*.o
-*.obj
-
-# Precompiled Headers
-*.gch
-*.pch
-
-# Compiled Dynamic libraries
-*.so
-*.dylib
-*.dll
-
-# Fortran module files
-*.mod
-*.smod
-
-# Compiled Static libraries
-*.lai
-*.la
-*.a
-*.lib
+# Build directories
+build/
+cmake-build-*/
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+Makefile
 
 # Executables
+SysMon-cpp
+test_CpuMonitor
 *.exe
 *.out
 *.app
+
+# Object files
+*.o
+*.obj
+*.so
+*.dll
+*.dylib
+*.a
+*.lib
+
+# Debug files
+*.dSYM/
+*.su
+*.idb
+*.pdb
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Log files
+*.log
+sysmon.log
+
+# Export files
+sysmon_export.txt
+sysmon_export.csv
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+*.backup
+
+# Coverage files
+*.gcov
+*.gcno
+*.gcda
+coverage/
+*.info
+
+# Documentation generated files
+docs/
+html/
+latex/
+
+# Package files
+*.deb
+*.rpm
+*.tar.gz
+*.zip
+
+# CMake generated files
+CTestTestfile.cmake
+Testing/
+_CPack_Packages/
+install_manifest.txt
+
+# Compiler-specific
+.ccls-cache/
+compile_commands.json
+
+# System-specific
+.Trash-*
+ehthumbs.db
+Desktop.ini
