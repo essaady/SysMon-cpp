@@ -29,11 +29,44 @@ int SysMon::run(int limit){
     return 0;
 }
 
-bool SysMon::update(){
-    CpuMonitor::update();
-    ProcessMonitor::update();
-    MemoryMonitor::update();
-    return true;
+bool SysMon::update() {
+    bool success = true;
+    success &= CpuMonitor::update();
+    success &= ProcessMonitor::update();
+    success &= MemoryMonitor::update();
+    return success;
+}
+
+string SysMon::exportAsText() {
+    stringstream ss;
+    ss << "=== System Monitor Report ===" << endl;
+    ss << "Time: " << getTime() << endl << endl;
+    
+    // CPU Information
+    ss << "CPU Usage: " << getCpuUsage() << "%" << endl;
+    ss << "CPU Frequency: " << getCpuFreq() << " MHz" << endl;
+    ss << getCpuInfo() << endl;
+    
+    // Memory Information
+    ss << "Memory Usage: " << getMemoryUsagePercentage() << "%" << endl;
+    ss << "Total Memory: " << getTotalMemory() << " MB" << endl;
+    ss << "Free Memory: " << getFreeMemory() << " MB" << endl;
+    ss << "Swap Usage: " << getSwapUsagePercentage() << "%" << endl;
+    
+    // Process Information
+    ss << getProcessInfo() << endl;
+    
+    return ss.str();
+}
+
+string SysMon::exportAsCSV() {
+    stringstream ss;
+    ss << "Timestamp,CPU Usage,Memory Usage,Process Count" << endl;
+    ss << getTime() << "," 
+       << getCpuUsage() << "," 
+       << getMemoryUsagePercentage() << "," 
+       << nbrProcess << endl;
+    return ss.str();
 }
 
 //function to get the current time for loggin.

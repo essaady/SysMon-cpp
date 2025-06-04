@@ -2,13 +2,10 @@
 #include "../include/SysMon.h"
 using namespace std;
 
-// Constructeur
 MemoryMonitor::MemoryMonitor() {
     // Initialisation des ressources si nécessaire
 }
 
-
-// Destructeur
 MemoryMonitor::~MemoryMonitor() {
     // Libération des ressources si nécessaire
 

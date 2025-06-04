@@ -6,12 +6,14 @@
 #include <string>
 #include <sstream>
 
-typedef struct ap{
-    float cpu;
-    float memory;
-    struct time;
-    std::string user;
-    std::string pathName;
+typedef struct activeProcesses {
+    float cpu;               // CPU usage per process
+    float memory;           // Memory usage per process
+    struct time;            // Process time information
+    std::string user;       // Process owner
+    std::string pathName;   // Process executable path
+    int* PID;              // Process IDs array
+    int nbrProcess;        // Number of active processes
 } activeProcesses;
 
 
