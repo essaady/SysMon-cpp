@@ -1,45 +1,78 @@
-#ifdef _WIN32
-#include <windows.h>
 #include <iostream>
+#include "../include/CpuMonitor.h"
+#include <windows.h>
+#include <string>
 
-class CpuMonitor
+using namespace std;
+
+CpuMonitor::CpuMonitor()
 {
-public:
-    double getCpuUsage()
+    usageCPU = 0.0f;
+    usagePerCPU = nullptr;
+    nbrCPU = 0;
+    frequency = 0.0f;
+    frequencyMax = 0.0f;
+
+    GetSystemTimes(&prevIdleTime, &prevKernelTime, &prevUserTime);
+
+    SYSTEM_INFO sysInfo;
+    GetSystemInfo(&sysInfo);
+    nbrCPU = static_cast<short>(sysInfo.dwNumberOfProcessors);
+
+    usagePerCPU = new float[nbrCPU]();
+}
+
+CpuMonitor::~CpuMonitor()
+{
+    delete[] usagePerCPU;
+}
+
+bool CpuMonitor::update()
+{
+    FILETIME idleTime, kernelTime, userTime;
+    if (!GetSystemTimes(&idleTime, &kernelTime, &userTime))
     {
-        static FILETIME prevIdleTime, prevKernelTime, prevUserTime;
-        FILETIME idleTime, kernelTime, userTime;
-
-        if (!GetSystemTimes(&idleTime, &kernelTime, &userTime))
-        {
-            std::cerr << "Failed to get CPU times.\n";
-            return -1;
-        }
-
-        ULONGLONG idleDiff = subtractTimes(idleTime, prevIdleTime);
-        ULONGLONG kernelDiff = subtractTimes(kernelTime, prevKernelTime);
-        ULONGLONG userDiff = subtractTimes(userTime, prevUserTime);
-
-        ULONGLONG total = kernelDiff + userDiff;
-
-        prevIdleTime = idleTime;
-        prevKernelTime = kernelTime;
-        prevUserTime = userTime;
-
-        if (total == 0)
-            return 0.0;
-        return (1.0 - ((double)idleDiff / total)) * 100.0;
+        return false;
     }
 
-private:
-    ULONGLONG subtractTimes(const FILETIME &a, const FILETIME &b)
-    {
-        ULARGE_INTEGER ua, ub;
-        ua.LowPart = a.dwLowDateTime;
-        ua.HighPart = a.dwHighDateTime;
-        ub.LowPart = b.dwLowDateTime;
-        ub.HighPart = b.dwHighDateTime;
-        return ua.QuadPart - ub.QuadPart;
-    }
-};
-#endif
+    ULONGLONG idleDiff = subtractTimes(idleTime, prevIdleTime);
+    ULONGLONG kernelDiff = subtractTimes(kernelTime, prevKernelTime);
+    ULONGLONG userDiff = subtractTimes(userTime, prevUserTime);
+    ULONGLONG total = kernelDiff + userDiff;
+
+    if (total == 0)
+        return false;
+
+    usageCPU = (1.0f - (idleDiff * 1.0f / total)) * 100.0f;
+
+    prevIdleTime = idleTime;
+    prevKernelTime = kernelTime;
+    prevUserTime = userTime;
+
+    return true;
+}
+
+float CpuMonitor::getCpuUsage() const
+{
+    return usageCPU;
+}
+
+float CpuMonitor::getCpuFreq() const
+{
+    return frequency;
+}
+
+std::string CpuMonitor::getCpuInfo() const
+{
+    return "CPU Usage: " + std::to_string(usageCPU) + "%";
+}
+
+ULONGLONG CpuMonitor::subtractTimes(const FILETIME &ftA, const FILETIME &ftB)
+{
+    ULARGE_INTEGER a, b;
+    a.LowPart = ftA.dwLowDateTime;
+    a.HighPart = ftA.dwHighDateTime;
+    b.LowPart = ftB.dwLowDateTime;
+    b.HighPart = ftB.dwHighDateTime;
+    return a.QuadPart - b.QuadPart;
+}
