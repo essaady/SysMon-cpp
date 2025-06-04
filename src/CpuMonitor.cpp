@@ -203,9 +203,11 @@ void CpuMonitor::ImplementCpuValues(){
     idle_delta = curr_idle - prev_idle;
 
 
-
-    CPU.usageCPU = (float(total_delta - idle_delta) / float(total_delta) * 100.0);
-
+    if(total_delta == 0){
+        CPU.usageCPU = 0.0f;
+    }else{
+        CPU.usageCPU = (float(total_delta - idle_delta) / float(total_delta) * 100.0);
+    }
 
     // for the cores
 
@@ -232,8 +234,11 @@ void CpuMonitor::ImplementCpuValues(){
 
         idle_delta = curr_idle - prev_idle;
 
-        CPU.usagePerCpu[i] = (float(total_delta - idle_delta) / total_delta) * 100.0;
-
+        if(total_delta == 0){
+            CPU.usagePerCpu[i] = 0.0f;
+        }else{
+            CPU.usagePerCpu[i] = (float(total_delta - idle_delta) / total_delta) * 100.0;
+        }
     }
 
     rawCPU = "";
