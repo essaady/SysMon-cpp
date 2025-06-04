@@ -15,17 +15,15 @@ SysMon::SysMon(int updateInterval, bool fullLog): CpuMonitor(), MemoryMonitor(),
 SysMon::~SysMon(){}
 
 
-int SysMon::run(int limit){
+int SysMon::run(){
     int i = 0;
-    while (i < limit)
-    {
+    
         usleep(updateInterval);
         if(!fullLog){
             system("clear");
         }
         update();
         i++;
-    }
     return 0;
 }
 

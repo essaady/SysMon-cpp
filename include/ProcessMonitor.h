@@ -29,7 +29,7 @@ public:
 
     bool update();
 
-    activeProcesses getProcess(int);
+    activeProcesses getProcess(int index);
     
     std::string getProcessInfo();
 

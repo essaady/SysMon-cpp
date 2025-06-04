@@ -12,8 +12,7 @@ int main(int argc, char *argv[])
     if (argc >= 2)
     {
         bool isReconized = false;
-        for (auto param : options)
-        {
+        for (auto param : options){
             char *argument = new char[param.length() + 1];
             strcpy(argument, param.c_str());
             if (!strcmp(argv[1], argument))

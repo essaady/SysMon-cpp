@@ -35,7 +35,7 @@ public:
     
     ~SysMon();
 
-    int run(int limit=3);
+    int run();
 
     string exportAsText();
 
