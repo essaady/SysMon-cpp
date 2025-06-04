@@ -1,4 +1,3 @@
-#include <iostream>
 #include "../include/MemoryMonitor.h"
 #include "../include/CpuMonitor.h"
 #include "../include/ProcessMonitor.h"
@@ -58,6 +57,10 @@ int main(int argc, char *argv[])
         i++;
         usleep(500000);
     }
+
+    int updateInterval = 5e5;
+    
+    SysMon SysMonCpp(updateInterval);
 
     
     return 0;

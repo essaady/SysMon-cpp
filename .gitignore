@@ -44,3 +44,14 @@
 vscode/
 build/
 CMakeLists.txt
+
+# Text files
+*.txt
+
+# Swap files
+*.swp
+
+# Vscode
+.vscode/
+build/
+CMakeLists.txt
