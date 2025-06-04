@@ -1,13 +1,9 @@
 #include "../include/SysMon.h"
 
-
 int main(int argc, char *argv[])
 {
-
-    // clear the screen on start
     system("clear");
     vector<string> options = {"--help", "--update", "--export"};
-    // checking for user argument
     int option = 0;
     if (argc >= 2)
     {

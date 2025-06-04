@@ -4,37 +4,40 @@
 
 #include <vector>
 #include <string>
+#include <iostream>
+#include <fstream>
 #include <sstream>
+#include <unistd.h>
+#include <sys/stat.h>
 
-typedef struct ap{
+#define PROC_PATH "/proc/"
+
+typedef struct ap {
+    int pid;
     float cpu;
     float memory;
-    struct time;
     std::string user;
-    std::string pathName;
+    std::string command;
 } activeProcesses;
 
-
-
-class ProcessMonitor{
-protected:
-    activeProcesses AP;
-    int nbrProcess;
+class ProcessMonitor {
+private:
+    std::vector<activeProcesses> processes;
+    
+    bool parseProcessInfo(int pid, activeProcesses& process);
+    std::string getProcessUser(int pid);
+    float getProcessCpuUsage(int pid);
+    float getProcessMemoryUsage(int pid);
 
 public:
-    
     ProcessMonitor();
-
     ~ProcessMonitor();
-
-    bool update();
-
-    activeProcesses getProcess(int);
     
-    std::string getProcessInfo();
-
-    std::string getProcessRaw();
-
+    bool update();
+    
+    const std::vector<activeProcesses>& getProcesses() const;
+    
+    void displayProcessInfo(int limit = 10);
 };
 
 #endif
