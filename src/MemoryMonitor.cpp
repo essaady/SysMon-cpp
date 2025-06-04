@@ -1,5 +1,8 @@
 #include "MemoryMonitor.h"
 #include <iostream>
+#include <fstream>
+#include <sstream>
+#include <string>
 
 MemoryMonitor::MemoryMonitor() {
     RAM.totalMemInMb = 0;
@@ -12,13 +15,44 @@ MemoryMonitor::MemoryMonitor() {
 
 
 bool MemoryMonitor::update() {
-    RAM.totalMemInMb = 16384;      // 16 GB total RAM
-    RAM.freeMem = 8192;            // 8 GB free RAM
-    RAM.SwapMeminMb = 8192;        // 8 GB total swap
-    RAM.freeSwp = 6144;            // 6 GB free swap
-    RAM.usage = RAM.totalMemInMb - RAM.freeMem;  // Used RAM
-    RAM.usageSwp = RAM.SwapMeminMb - RAM.freeSwp;  // Used swap
-    return true; 
+    std::ifstream meminfo("/proc/meminfo");
+    if (!meminfo.is_open()) {
+        std::cerr << "Failed to open /proc/meminfo" << std::endl;
+        return false;
+    }
+
+    std::string line;
+    unsigned long long memTotal = 0, memFree = 0, buffers = 0, cached = 0;
+    unsigned long long swapTotal = 0, swapFree = 0;
+
+    while (std::getline(meminfo, line)) {
+        std::istringstream ss(line);
+        std::string key;
+        unsigned long long value;
+        std::string unit;
+
+        ss >> key >> value >> unit;
+
+        if (key == "MemTotal:") memTotal = value;
+        else if (key == "MemFree:") memFree = value;
+        else if (key == "Buffers:") buffers = value;
+        else if (key == "Cached:") cached = value;
+        else if (key == "SwapTotal:") swapTotal = value;
+        else if (key == "SwapFree:") swapFree = value;
+    }
+    meminfo.close();
+
+    unsigned long long usedMem = memTotal - memFree - buffers - cached;
+    unsigned long long usedSwap = swapTotal - swapFree;
+
+    RAM.totalMemInMb = memTotal / 1024;
+    RAM.freeMem = memFree / 1024;
+    RAM.SwapMeminMb = swapTotal / 1024;
+    RAM.freeSwp = swapFree / 1024;
+    RAM.usage = usedMem / 1024;
+    RAM.usageSwp = usedSwap / 1024;
+
+    return true;
 }
 
 unsigned long long MemoryMonitor::getTotalMemory() {
