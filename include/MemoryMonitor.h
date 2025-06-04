@@ -7,4 +7,4 @@ public:
     double getUsedMemoryMB();
 };
 
-#endif 
+#endif

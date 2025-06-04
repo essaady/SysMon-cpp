@@ -3,30 +3,49 @@
 #include <string>
 #include <sstream>
 
-MemoryMonitor::MemoryMonitor() {}
+MemoryMonitor::MemoryMonitor() {
+
+}
 
 double MemoryMonitor::getUsedMemoryMB() {
-    std::ifstream file("/proc/meminfo");
-    std::string line;
-    long memTotal = 0;
-    long memFree = 0;
+    std::ifstream meminfo("/proc/meminfo");
+    if (!meminfo.is_open()) {
+ 
+        return -1.0;
+    }
 
-    while (std::getline(file, line)) {
+    std::string line;
+    long memTotalKB = 0;
+    long memFreeKB = 0;
+
+    while (std::getline(meminfo, line)) {
         std::istringstream iss(line);
         std::string key;
         long value;
         std::string unit;
-        
+
         iss >> key >> value >> unit;
 
         if (key == "MemTotal:") {
-            memTotal = value;
+            memTotalKB = value;
         } else if (key == "MemFree:") {
-            memFree = value;
+            memFreeKB = value;
         }
 
-        if (memTotal && memFree) break; 
+  
+        if (memTotalKB > 0 && memFreeKB > 0) {
+            break;
+        }
     }
 
-    return (memTotal - memFree) / 1024.0; // transforme KB à MB
+    meminfo.close();
+
+    if (memTotalKB == 0) {
+        return -1.0; 
+    }
+
+    long usedKB = memTotalKB - memFreeKB;
+    double usedMB = usedKB / 1024.0; 
+
+    return usedMB;
 }
