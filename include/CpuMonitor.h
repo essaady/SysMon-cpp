@@ -15,6 +15,8 @@ private:
         float usageCPU;
         float* usagePerCPU;
         short nbrCPU;
+        bool update();
+
     };
     
     CpuData cpuData;
