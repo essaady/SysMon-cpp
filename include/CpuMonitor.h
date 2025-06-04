@@ -1,9 +1,6 @@
 #pragma once
-#ifndef _CPU_MON_H
-#define _CPU_MON_H
-
-
-#include "./SysMon.h"
+#ifndef _CPUMONITOR_H
+#define _CPUMONITOR_H
 
 
 class CpuMon : public SysMon{

@@ -40,5 +40,7 @@
 #temporary files
 .tmp
 
-# Vscode
-.vscode/
+# folders
+vscode/
+build/
+CMakeLists.txt

@@ -10,7 +10,7 @@ int main(int argc, char *argv[])
 
     // clear the screen on start
     system("clear");
-    std::vector<std::string> options = {"--help", "--update", "--export"};
+    std::vector<std::string> options = {"--help", "--export"};
     int option = 0;
     // checking for user argument
     if (argc >= 2)
@@ -37,6 +37,11 @@ int main(int argc, char *argv[])
         {
             option = options::_NLOG;
         }
+        else if(!strcmp(argv[1], "--help")){
+            std::cout << "./SysMon\nA program that will calculate both the memory and cpu usage, while also showing the current running processes.\noptions:\n--help : show commandes\n--export: export mem and cpu usage in a log file.\n";
+            exit(0);
+        }
+        
     }
 
     CpuMon cpu;
@@ -46,13 +51,12 @@ int main(int argc, char *argv[])
     int i = 0;
     while (i < 10)
     {
-        usleep(1000000);
-
         system("clear");
         cpu.calcCpuUsage(option);
         mem.memUsage(option);
         process.getProcess();
         i++;
+        usleep(500000);
     }
 
     
