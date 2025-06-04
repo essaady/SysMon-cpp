@@ -1,47 +1,84 @@
 #include "../include/MemoryMonitor.h"
-#include "../include/SysMon.h"
+#include "../include/FileUtils.h"
+#include <sstream>
+
 using namespace std;
 
-// Constructeur
-MemoryMonitor::MemoryMonitor() {
-    // Initialisation des ressources si nécessaire
+bool MemoryMonitor::update() {
+    memInfo = FileUtils::readFileLines("/proc/meminfo");
+    return !memInfo.empty();
 }
 
-
-// Destructeur
-MemoryMonitor::~MemoryMonitor() {
-    // Libération des ressources si nécessaire
-
-}
-
-// Getting memory usage
-size_t MemoryMonitor::memUsage(int logger)
-{
-    std::string info = SysMon::getInfo("/proc/meminfo");
-
-    std::istringstream iss(info);
-    std::string temp;
-    std::vector<std::string> mem;
-    while (iss >> temp)
-    {
-        mem.push_back(temp);
+unsigned long MemoryMonitor::getTotalMemory() {
+    for (const string& line : memInfo) {
+        if (line.find("MemTotal:") != string::npos) {
+            istringstream iss(line);
+            string key;
+            unsigned long value;
+            string unit;
+            iss >> key >> value >> unit;
+            return value;
+        }
     }
-
-    size_t memUsage = (stoi(mem[1]) - stoi(mem[4]));
-    std::cout << "Free memory : " << mem[1] + mem[2] << " Available memory : " << mem[4] + mem[5] << " \x1b[41mMemory usage : " << memUsage << "kB\x1b[0m" << std::endl;
-    if (logger == options::_NLOG)
-    {
-        std::stringstream out;
-
-        out << "Free memory : " << mem[1] + mem[2] << " Available memory : " << mem[4] + mem[5] << " Memory usage : " << memUsage << "kB\n"
-            << std::endl;
-        SysMon::log(out);
-    }
-    return memUsage;
+    return 0;
 }
 
-bool MemoryMonitor::update(){
-    //To-Do
-    memUsage(0);
-    return true;
+unsigned long MemoryMonitor::getFreeMemory() {
+    for (const string& line : memInfo) {
+        if (line.find("MemFree:") != string::npos) {
+            istringstream iss(line);
+            string key;
+            unsigned long value;
+            string unit;
+            iss >> key >> value >> unit;
+            return value;
+        }
+    }
+    return 0;
+}
+
+unsigned long MemoryMonitor::getUsedMemory() {
+    return getTotalMemory() - getFreeMemory();
+}
+
+double MemoryMonitor::getMemoryUsagePercentage() {
+    if (getTotalMemory() == 0) return 0.0;
+    return (getUsedMemory() * 100.0) / getTotalMemory();
+}
+
+unsigned long MemoryMonitor::getTotalSwap() {
+    for (const string& line : memInfo) {
+        if (line.find("SwapTotal:") != string::npos) {
+            istringstream iss(line);
+            string key;
+            unsigned long value;
+            string unit;
+            iss >> key >> value >> unit;
+            return value;
+        }
+    }
+    return 0;
+}
+
+unsigned long MemoryMonitor::getFreeSwap() {
+    for (const string& line : memInfo) {
+        if (line.find("SwapFree:") != string::npos) {
+            istringstream iss(line);
+            string key;
+            unsigned long value;
+            string unit;
+            iss >> key >> value >> unit;
+            return value;
+        }
+    }
+    return 0;
+}
+
+unsigned long MemoryMonitor::getUsedSwap() {
+    return getTotalSwap() - getFreeSwap();
+}
+
+double MemoryMonitor::getSwapUsagePercentage() {
+    if (getTotalSwap() == 0) return 0.0;
+    return (getUsedSwap() * 100.0) / getTotalSwap();
 }
