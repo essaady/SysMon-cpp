@@ -22,4 +22,23 @@ int main() {
 
     return 0;
 }
+#include "MemoryMonitor.h"
+#include <iostream>
+
+int main() {
+    MemoryMonitor mem;
+    if (mem.update()) {
+        cout << "Total RAM: " << mem.getTotalMemory() << " MB" << endl;
+        cout << "Free RAM: " << mem.getFreeMemory() << " MB" << endl;
+        cout << "RAM Usage: " << mem.getMemoryUsagePercentage() << "%" << endl;
+
+        cout << "Total Swap: " << mem.getTotalSwap() << " MB" << endl;
+        cout << "Used Swap: " << mem.getUsedSwap() << " MB" << endl;
+        cout << "Swap Usage: " << mem.getSwapUsagePercentage() << "%" << endl;
+    } else {
+        cerr << "Failed to read memory info." << endl;
+    }
+    return 0;
+}
+
 
