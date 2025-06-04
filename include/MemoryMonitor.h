@@ -1,49 +1,42 @@
-#pragma once
-#ifndef _MEMORYMONITOR_H
-#define _MEMORYMONITOR_H
+#ifndef MEMORYMONITOR_H
+#define MEMORYMONITOR_H
 
 #include <string>
 #include <vector>
 
-typedef struct ram{
-    float usage;
-    float freeMem;
-    float usageSwp;
-    float freeSwp;
-    std::size_t totalMemInMb;
-    std::size_t SwapMeminMb;
-} ram;
+using namespace std;
+
+struct RAM {
+    vector<string> memInfo;
+    unsigned long long totalPhysical;
+    unsigned long long availablePhysical;
+    unsigned long long usedPhysical;
+};
 
 class MemoryMonitor {
-protected:
-    ram RAM;
-    std::vector<std::string> memInfo;
+private:
+    size_t totalMemMb;
+    float freeMem;
+    size_t SwapMemMb;
+    float freeSwap;
+    RAM ram;
 
 public:
     MemoryMonitor();
-    
     ~MemoryMonitor();
-
+    
     bool update();
-
-    unsigned long long getTotalMemory() const;
-
-    unsigned long long getFreeMemory() const;
+    unsigned long long getTotalMemory();
+    unsigned long long getFreeMemory();
+    unsigned long long getTotalSwap();
+    unsigned long long getUsedSwap();
+    double getMemoryUsagePercentage();
+    double getSwapUsagePercentage();
     
-    unsigned long long getUsedMemory() const;
-    
-    double getMemoryUsagePercentage() const;
-
-    unsigned long long getTotalSwap() const;
-    
-    unsigned long long getFreeSwap() const;
-    
-    unsigned long long getUsedSwap() const;
-    
-    double getSwapUsagePercentage() const;
-
-    std::size_t memUsage(int log);
-
+    size_t getTotalMemMb() const { return totalMemMb; }
+    float getFreeMem() const { return freeMem; }
+    size_t getSwapMemMb() const { return SwapMemMb; }
+    float getFreeSwap() const { return freeSwap; }
 };
 
-#endif
+#endif 
