@@ -5,6 +5,13 @@
 #include <map>
 #include <vector>
 
+#include "./SysMon.h"
+
+class MemInfo : public SysMon{
+public:
+    size_t memUsage(int log);
+};
+
 class MemoryMonitor {
 public:
     struct RAM {
@@ -41,4 +48,8 @@ private:
     bool readMemInfo();
 };
 
+<<<<<<< HEAD
 #endif // MEMORY_MONITOR_H
+=======
+#endif
+>>>>>>> 9422ef0e1d7396d3be674cfd344bfd0d2458f631
