@@ -6,13 +6,17 @@
 #include <string>
 #include <sstream>
 
-typedef struct ap{
+struct activeProcesses {
+    int pid;
     float cpu;
     float memory;
-    struct time;
+    std::string elapsedTime;  // Replacing `struct time` with readable field
     std::string user;
     std::string pathName;
-} activeProcesses;
+    std::vector<activeProcesses> processList; //Internal process list is missing
+
+};
+
 
 
 
