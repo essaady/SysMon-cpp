@@ -1,0 +1,18 @@
+#include <iostream>
+#include "CpuMonitor.h"
+
+int main() {
+    CpuMonitor cpuMon;
+
+    if (cpuMon.update()) {
+        std::cout << "=== Informations CPU ===" << std::endl;
+        std::cout << cpuMon.getCpuInfo() << std::endl;
+
+        std::cout << "Utilisation globale: " << cpuMon.getCpuUsage() << "%" << std::endl;
+        std::cout << "Frequence actuelle: " << cpuMon.getCpuFreq() << " GHz" << std::endl;
+    } else {
+        std::cerr << "Erreur: Impossible de mettre à jour les données CPU." << std::endl;
+    }
+
+    return 0;
+}
