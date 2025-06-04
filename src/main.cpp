@@ -1,19 +1,15 @@
-#include "../include/FileUtils.h"
 #include "../include/MemoryMonitor.h"
 #include <iostream>
-#include <vector>
-
 using namespace std;
 
 int main() {
-    vector<string> lignes = FileUtils::readFileLines("/proc/cpuinfo");
-
-    for (const string& ligne : lignes) {
-        cout << ligne << endl;
+    MemoryMonitor monitor;
+    if (monitor.update()) {
+        cout << "Memory usage: " << monitor.getMemoryUsagePercentage() << "%" << endl;
+        cout << "Swap usage: " << monitor.getSwapUsagePercentage() << "%" << endl;
+    } else {
+        cout << "Erreur lors de la lecture de /proc/meminfo" << endl;
     }
-
-    float memUsage = MemoryMonitor::getMemoryUsage();
-    cout << "Memory Usage: " << memUsage << "%" << endl;
 
     return 0;
 }

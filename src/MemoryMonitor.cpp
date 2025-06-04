@@ -1,30 +1,84 @@
-#include "MemoryMonitor.h"
-#include <fstream>
-#include <string>
+#include "../include/MemoryMonitor.h"
+#include "../include/FileUtils.h"
 #include <sstream>
 
 using namespace std;
 
-float MemoryMonitor::getMemoryUsage() {
-    ifstream meminfo("/proc/meminfo");
-    string line;
-    long memTotal = 0, memFree = 0, buffers = 0, cached = 0;
+bool MemoryMonitor::update() {
+    memInfo = FileUtils::readFileLines("/proc/meminfo");
+    return !memInfo.empty();
+}
 
-    while (getline(meminfo, line)) {
-        istringstream iss(line);
-        string key;
-        long value;
-        string unit;
-        iss >> key >> value >> unit;
-
-        if (key == "MemTotal:") memTotal = value;
-        else if (key == "MemFree:") memFree = value;
-        else if (key == "Buffers:") buffers = value;
-        else if (key == "Cached:") cached = value;
+unsigned long MemoryMonitor::getTotalMemory() {
+    for (const string& line : memInfo) {
+        if (line.find("MemTotal:") != string::npos) {
+            istringstream iss(line);
+            string key;
+            unsigned long value;
+            string unit;
+            iss >> key >> value >> unit;
+            return value;
+        }
     }
+    return 0;
+}
 
-    long usedMemory = memTotal - memFree - buffers - cached;
-    if (memTotal == 0) return 0.0f;
+unsigned long MemoryMonitor::getFreeMemory() {
+    for (const string& line : memInfo) {
+        if (line.find("MemFree:") != string::npos) {
+            istringstream iss(line);
+            string key;
+            unsigned long value;
+            string unit;
+            iss >> key >> value >> unit;
+            return value;
+        }
+    }
+    return 0;
+}
 
-    return (usedMemory * 100.0f) / memTotal;
+unsigned long MemoryMonitor::getUsedMemory() {
+    return getTotalMemory() - getFreeMemory();
+}
+
+double MemoryMonitor::getMemoryUsagePercentage() {
+    if (getTotalMemory() == 0) return 0.0;
+    return (getUsedMemory() * 100.0) / getTotalMemory();
+}
+
+unsigned long MemoryMonitor::getTotalSwap() {
+    for (const string& line : memInfo) {
+        if (line.find("SwapTotal:") != string::npos) {
+            istringstream iss(line);
+            string key;
+            unsigned long value;
+            string unit;
+            iss >> key >> value >> unit;
+            return value;
+        }
+    }
+    return 0;
+}
+
+unsigned long MemoryMonitor::getFreeSwap() {
+    for (const string& line : memInfo) {
+        if (line.find("SwapFree:") != string::npos) {
+            istringstream iss(line);
+            string key;
+            unsigned long value;
+            string unit;
+            iss >> key >> value >> unit;
+            return value;
+        }
+    }
+    return 0;
+}
+
+unsigned long MemoryMonitor::getUsedSwap() {
+    return getTotalSwap() - getFreeSwap();
+}
+
+double MemoryMonitor::getSwapUsagePercentage() {
+    if (getTotalSwap() == 0) return 0.0;
+    return (getUsedSwap() * 100.0) / getTotalSwap();
 }
