@@ -89,7 +89,7 @@ std::string ProcessMonitor::getProcessInfo()
             << std::setw(12) << proc.memoryUsage / 1024
             << std::setw(20) << proc.userName
             << std::setw(30) << proc.pathName
-            << proc.startTime << "\n";
+            << proc.startTime << "\n";;
     }
 
     return oss.str();
