@@ -21,6 +21,12 @@ protected:
     };
     vector<AP> ap;
     int nbrProcess;
+
+    // Helper functions for reading /proc data
+    bool isNumeric(const std::string& str);
+    time_t getBootTime();
+    string getUsername(int uid);
+
 public:
     ProcessMonitor();
     
