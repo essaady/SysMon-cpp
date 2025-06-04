@@ -1,12 +1,25 @@
 #ifndef CPUMONITOR_H
 #define CPUMONITOR_H
 
+#include <string>
+
 class CpuMonitor {
 public:
-    CpuMonitor();               // constructeur par défaut
-    float getCpuUsage();        // retourne l'utilisation du CPU
+    CpuMonitor();
+    float getCpuUsage();
+private:
+
+    struct CpuData {
+        float frequency;
+        float frequencyMax;
+        float usageCPU;
+        float* usagePerCPU;
+        short nbrCPU;
+    };
+    
+    CpuData cpuData;
+    std::string rawCPU;
+
 };
 
 #endif 
-
-
