@@ -36,7 +36,18 @@ int main(int argc, char *argv[])
     }
     
     int updateInterval = 5e5;
-    
+    cout << "#########################################################################"<<endl;
+
+    // SysMon SysMonCpp(updateInterval);
+    // SysMonCpp.update();
+    // float cpuFreq = SysMonCpp.getCpuFreq();
+    // std::cout << "Current CPU Frequency: " << cpuFreq << " MHz" << std::endl;
+
+    CpuMonitor testCpuMonitor;
+    testCpuMonitor.update();
+    float cpuFfreq = testCpuMonitor.getCpuFreq();
+    std:: cout<< "current CPU freq :" << cpuFfreq << " mhz"<<std::endl;
+
     SysMon SysMonCpp(updateInterval);
 
     return SysMonCpp.run();
