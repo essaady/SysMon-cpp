@@ -1,6 +1,6 @@
 #pragma once
-#ifndef _SYSMON_H
-#define _SYSMON_H
+#ifndef SYSMON_H
+#define SYSMON_H
 
 #include "./CpuMonitor.h"
 #include "./MemoryMonitor.h"

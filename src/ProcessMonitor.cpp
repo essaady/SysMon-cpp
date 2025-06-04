@@ -6,13 +6,9 @@
 
 using namespace std;
 
-// Constructeur
 ProcessMonitor::ProcessMonitor() {
     // Initialisation des ressources si nécessaire
 }
-
-
-// Destructeur
 ProcessMonitor::~ProcessMonitor() {
     // Libération des ressources si nécessaire
 

@@ -38,21 +38,14 @@ class CpuMonitor {
     private:
         CpuTimes previousTimes;
         CpuTimes currentTimes;
-        
-    protected:
-        // Vous pourrez ajouter des variables privées ici plus tard pour stocker l'état du CPU
-        cpu CPU;
-
+          private:
         std::string rawCPU;
         CpuTimes readCpuTimes(); // read proc/stat
         void updateTimes(); 
         
 
     public:
-        // Constructeur
         CpuMonitor();
-        
-        // Destructeur
         ~CpuMonitor();
 
         // Méthode pour récupérer l'utilisation du CPU

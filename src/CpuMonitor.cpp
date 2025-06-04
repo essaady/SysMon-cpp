@@ -1,11 +1,9 @@
 #include "../include/CpuMonitor.h"
 using namespace std;
 
-// Constructeur
 CpuMonitor::CpuMonitor() {
-    // Initialisation des ressources si nécessaire
-    CPU.frequencyMax = 0; //To-Do 
-    CPU.nbrCPU = 0;  //To-Do
+    CPU.frequencyMax = 0;
+    CPU.nbrCPU = 0;  
 }
 
 // Méthode pour récupérer l'utilisation du CPU (sera implémentée plus tard)
