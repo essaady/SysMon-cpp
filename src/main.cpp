@@ -1,21 +1,21 @@
 #include <iostream>
-#include "CpuMonitor.h"
 #include <thread>
 #include <chrono>
+#include "CpuMonitor.h"
 
 int main() {
     CpuMonitor monitor;
 
     while (true) {
-        double usage = monitor.getCpuUsage();
-        if (usage < 0) {
-            std::cerr << "Erreur lecture CPU\n";
+        if (!monitor.update()) {
+            std::cerr << "Erreur mise à jour CPU\n";
             return 1;
         }
 
-        std::cout << "Utilisation CPU : " << usage << " %" << std::endl;
+        std::cout << monitor.getCpuInfo() << std::endl;
 
         std::this_thread::sleep_for(std::chrono::seconds(1));
     }
+
     return 0;
 }
