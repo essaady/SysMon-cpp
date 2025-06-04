@@ -1,4 +1,3 @@
-#pragma once
 #ifndef _CPUMONITOR_H
 #define _CPUMONITOR_H
 #include <string>
@@ -9,26 +8,26 @@ typedef struct cpu{
         float usageCPU;
         float* usagePerCPU;
         short nbrCPU;
-    } cpu;
+} cpu;
 
 // Structure to hold CPU time values read from /proc/stat
 typedef struct CpuTimes {
-    long long user = 0;
-    long long nice = 0;
-    long long system = 0;
-    long long idle = 0;
-    long long iowait = 0;
-    long long irq = 0;
-    long long softirq = 0;
-    long long steal = 0;
-    long long guest = 0;
-    long long guest_nice = 0;
+    int user = 0;
+    int nice = 0;
+    int system = 0;
+    int idle = 0;
+    int iowait = 0;
+    int irq = 0;
+    int softirq = 0;
+    int steal = 0;
+    int guest = 0;
+    int guest_nice = 0;
 
-    long long totalIdleTime() const {
+    int totalIdleTime() const {
         return idle + iowait;
     }
 
-    long long totalTime() const {
+    int totalTime() const {
         return user + nice + system + idle + iowait + irq + softirq + steal + guest + guest_nice;
     }
 } CpuTimes;
@@ -41,11 +40,10 @@ class CpuMonitor {
         
     protected:
         // Vous pourrez ajouter des variables privées ici plus tard pour stocker l'état du CPU
-        cpu CPU;
-
+        cpu CPU{};
         std::string rawCPU;
         CpuTimes readCpuTimes(); // read proc/stat
-        void updateTimes(); 
+        void updateTimes();
         
 
     public:
@@ -54,12 +52,14 @@ class CpuMonitor {
         
         // Destructeur
         ~CpuMonitor();
-
+        // DONE : Méthode pour récupérer le nombre des cœurs du CPU
+        static short getCpuCoreNumber();
         // Méthode pour récupérer l'utilisation du CPU
         float getCpuUsage();
-        
+        // DONE: Méthode pour récupérer le fréquence du CPU
         float getCpuFreq();
 
+        float getCpuMaxFreq();
         std::string getCpuInfo();
 
         bool update();
