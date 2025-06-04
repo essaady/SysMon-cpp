@@ -29,4 +29,6 @@ public:
     double getSwapUsagePercentage() const;
 };
 
+//le diagramme UML était respecté d'une manière stricte 
+
 #endif
