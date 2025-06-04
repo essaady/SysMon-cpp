@@ -41,7 +41,7 @@
 .tmp
 
 # folders
-vscode/
+.vscode/
 build/
 CMakeLists.txt
 
@@ -50,8 +50,3 @@ CMakeLists.txt
 
 # Swap files
 *.swp
-
-# Vscode
-.vscode/
-build/
-CMakeLists.txt
