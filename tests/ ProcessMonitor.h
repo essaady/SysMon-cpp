@@ -1,35 +1,18 @@
-#ifndef PROCESSMONITOR_H
-#define PROCESSMONITOR_H
+ #include "CpuMonitor.h"
+#include <iostream>
+#include <thread>
+#include <chrono>
 
-#include <string>
-#include <vector>
+int main() {
+    CpuMonitor cpu;
 
-class ProcessMonitor {
-public:
-    struct Time {
-        std::string startTime;
-        std::string duration;
-    };
+    while (true) {
+        cpu.update();
+        std::cout << cpu.getCpuInfo() << std::endl;
+        std::this_thread::sleep_for(std::chrono::seconds(2));
+    }
 
-    struct AP {
-        std::string user;
-        float cpu;
-        float memory;
-        Time time;
-        std::string pathName;
-    };
+    return 0;
+}
 
-private:
-    int PID;
-    std::vector<AP> ap;
-    int nbrProcess;
-
-public:
-    ProcessMonitor();
-    bool update();
-    AP getProcess(int index);
-    std::string getProcessInfo();
-};
-
-#endif // PROCESSMONITOR_H
  
