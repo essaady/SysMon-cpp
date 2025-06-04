@@ -1,5 +1,15 @@
-#ifndef CPUMONITOR_H
-#define CPUMONITOR_H
+#pragma once
+#ifndef _CPUMONITOR_H
+#define _CPUMONITOR_H
+#include <string>
+
+typedef struct cpu{
+        float frequency;
+        float frequencyMax;
+        float usageCPU;
+        float* usagePerCPU;
+        short nbrCPU;
+    } cpu;
 
 #ifdef _WIN32
     #include <windows.h>
@@ -18,16 +28,29 @@
 #endif
 
 class CpuMonitor {
+protected:
+    cpu CPU;
+    std::string rawCPU;
+
 public:
     // Constructeur
     CpuMonitor();
-    
-    // Méthode pour récupérer l'utilisation du CPU (en pourcentage 0-100)
-    double getCpuUsage();
-    
+
     // Destructeur
     ~CpuMonitor();
-    
+
+    // Méthode pour récupérer l'utilisation du CPU
+    float getCpuUsage();
+
+    // Méthode pour récupérer la fréquence actuelle du CPU
+    float getCpuFreq();
+
+    // Méthode pour récupérer des informations brutes du CPU
+    std::string getCpuInfo();
+
+    // Mettre à jour les données CPU
+    bool update();
+
 private:
 #ifdef _WIN32
     PDH_HQUERY cpuQuery;
@@ -38,7 +61,7 @@ private:
     };
     CpuTimes lastCpuTimes;
     bool firstRead;
-    
+
     // Méthode privée pour lire les temps CPU depuis /proc/stat
     CpuTimes readCpuTimes();
 #elif defined(__APPLE__)
