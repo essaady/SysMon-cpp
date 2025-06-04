@@ -1,42 +1,62 @@
 #include "../include/SysMon.h"
-
+#include "../include/CpuMonitor.h"
+#include <iostream>
+#include <thread>
+#include <chrono>
+#include <vector>
+#include <cstring>
+#include <cstdlib>
 
 int main(int argc, char *argv[])
 {
-
     // clear the screen on start
     system("clear");
-    vector<string> options = {"--help", "--update", "--export"};
-    // checking for user argument
+
+    std::vector<std::string> options = {"--help", "--update", "--export", "--cpu"};
     int option = 0;
-    if (argc >= 2)
-    {
-        bool isReconized = false;
-        for (auto param : options)
-        {
-            char *argument = new char[param.length() + 1];
-            strcpy(argument, param.c_str());
-            if (!strcmp(argv[1], argument))
-            {
+    bool showCpuOnly = false;
+
+    // checking for user argument
+    if (argc >= 2) {
+        bool isRecognized = false;
+
+        for (const auto& param : options) {
+            if (param == argv[1]) {
                 std::cout << param << " Called\n";
-                isReconized = true;
+                isRecognized = true;
+
+                if (param == "--export") {
+                    option = options::_NLOG;
+                } else if (param == "--cpu") {
+                    showCpuOnly = true;
+                }
+
                 break;
             }
         }
-        if (!isReconized)
-        {
-            std::cout << "'" << argv[1] << "' command not reconigzed\n";
-            exit(-1);
-        }
 
-        if (!strcmp(argv[1], "--export"))
-        {
-            option = options::_NLOG;
+        if (!isRecognized) {
+            std::cout << "'" << argv[1] << "' command not recognized\n";
+            return -1;
         }
     }
-    
-    int updateInterval = 5e5;
-    
+
+    if (showCpuOnly) {
+        CpuMonitor monitor;
+
+        while (true) {
+            float usage = monitor.getCpuUsage();
+            if (usage < 0) {
+                std::cerr << "Erreur lecture CPU\n";
+                return 1;
+            }
+
+            std::cout << "Utilisation CPU : " << usage << " %" << std::endl;
+            std::this_thread::sleep_for(std::chrono::seconds(1));
+        }
+    }
+
+    int updateInterval = 500000; // 0.5 sec in microseconds
     SysMon SysMonCpp(updateInterval);
 
     return SysMonCpp.run();
