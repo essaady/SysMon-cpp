@@ -1,11 +1,18 @@
-#ifndef CPUMONITOR_H
-#define CPUMONITOR_H
-#include <vector>
+#pragma once
+#ifndef _CPUMONITOR_H
+#define _CPUMONITOR_H
 #include <string>
-#include <chrono>
+
+typedef struct cpu{
+        float frequency;
+        float frequencyMax;
+        float usageCPU;
+        float* usagePerCPU;
+        short nbrCPU;
+    } cpu;
 
 // Structure to hold CPU time values read from /proc/stat
-struct CpuTimes {
+typedef struct CpuTimes {
     long long user = 0;
     long long nice = 0;
     long long system = 0;
@@ -24,21 +31,38 @@ struct CpuTimes {
     long long totalTime() const {
         return user + nice + system + idle + iowait + irq + softirq + steal + guest + guest_nice;
     }
-};
-
+} CpuTimes;
 
 class CpuMonitor {
-public:
-    CpuMonitor();
-    // Calculates and returns the current CPU usage percentage
-    double getCpuUsage(); 
 
-private:
-    CpuTimes previousTimes;
-    CpuTimes currentTimes;
+    private:
+        CpuTimes previousTimes;
+        CpuTimes currentTimes;
+        
+    protected:
+        // Vous pourrez ajouter des variables privées ici plus tard pour stocker l'état du CPU
+        cpu CPU;
 
-    CpuTimes readCpuTimes(); // read proc/stat
-    void updateTimes();      // Updates  times
+        std::string rawCPU;
+        CpuTimes readCpuTimes(); // read proc/stat
+        void updateTimes(); 
+        
+
+    public:
+        // Constructeur
+        CpuMonitor();
+        
+        // Destructeur
+        ~CpuMonitor();
+
+        // Méthode pour récupérer l'utilisation du CPU
+        float getCpuUsage();
+        
+        float getCpuFreq();
+
+        std::string getCpuInfo();
+
+        bool update();
 };
 
 #endif 

@@ -1,10 +1,23 @@
 #include "../include/MemoryMonitor.h"
+#include "../include/SysMon.h"
+using namespace std;
+
+// Constructeur
+MemoryMonitor::MemoryMonitor() {
+    // Initialisation des ressources si nécessaire
+}
+
+
+// Destructeur
+MemoryMonitor::~MemoryMonitor() {
+    // Libération des ressources si nécessaire
+
+}
 
 // Getting memory usage
-size_t MemInfo::memUsage(int logger)
+size_t MemoryMonitor::memUsage(int logger)
 {
-
-    std::string info = getInfo("/proc/meminfo");
+    std::string info = SysMon::getInfo("/proc/meminfo");
 
     std::istringstream iss(info);
     std::string temp;
@@ -22,7 +35,13 @@ size_t MemInfo::memUsage(int logger)
 
         out << "Free memory : " << mem[1] + mem[2] << " Available memory : " << mem[4] + mem[5] << " Memory usage : " << memUsage << "kB\n"
             << std::endl;
-        log(out);
+        SysMon::log(out);
     }
     return memUsage;
+}
+
+bool MemoryMonitor::update(){
+    //To-Do
+    memUsage(0);
+    return true;
 }
