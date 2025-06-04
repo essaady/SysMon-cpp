@@ -13,8 +13,6 @@
 
 using namespace std;
 
-/**
-
 class CpuMonitor {
 private:
     // Attributs principaux (encapsulation)
