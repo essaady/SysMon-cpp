@@ -1,26 +1,36 @@
 #ifndef MEMORY_MONITOR_H
 #define MEMORY_MONITOR_H
 
+#include <iostream>
+#include <string>
+using namespace std;
+
 class MemoryMonitor {
-  private:
-
-  unsigned long total_memory;
-  unsigned long available_memory;
-  bool readMemoryData();
-  double calculateUsedPercent() const;
-
 public:
+    struct RAM {
+        size_t totalMemInMb;
+        float usage;
+        float freeMem;
+        size_t swapMeminMb;
+        float usageSwp;
+        float freeSwp;
+    } ram;
 
-  MemoryMonitor();
-  bool update();
+    string memInfo;
 
-  unsigned long getTotalMemory() const;
-  unsigned long getFreeMemory() const;
-  unsigned long getUsedMemory() const;
+    MemoryMonitor();
 
-  void display() const;
+    bool update();
 
+    unsigned long getTotalMemory() ;
+    unsigned long getFreeMemory() ;
+    unsigned long getUsedMemory() ;
+    double getMemoryUsagePercentage() ;
 
+    unsigned long getTotalSwap() ;
+    unsigned long getFreeSwap() ;
+    unsigned long getUsedSwap() ;
+    double getSwapUsagePercentage() ;
 };
 
 #endif
