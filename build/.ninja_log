@@ -1,7 +1,0 @@
-# ninja log v5
-2	1691	1746279452364071413	CMakeFiles/SysMon.dir/src/main.cpp.o	79d61a9d8bad1127
-390	692	1746282713195924473	SysMon	ce056906aa342ae1
-3	1752	1746279083334105482	CMakeFiles/cpu.dir/src/SysMon.cpp.o	243bcae7930b8ec4
-2	1594	1746279410744075220	CMakeFiles/cpu.dir/src/CpuMonitor.cpp.o	4715ba6e443c1ac2
-1	388	1746282712895924505	libcpu.a	7f76fc922ba458d0
-1	1554	1746279340924080549	CMakeFiles/cpu.dir/src/MemoryMonitor.cpp.o	22e118645faf011b

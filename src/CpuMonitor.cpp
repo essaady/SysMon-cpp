@@ -1,3 +1,4 @@
+
 #include "CpuMonitor.h"
 #include <sstream>
 #include <cstdlib>
@@ -91,4 +92,4 @@ float CpuMonitor::calcCpuUsage(int logger) {
     std::cout << "UsedTime : " << UsedTime << " TotalTime : " << TotalTime << " CpuUsage: " << results << "%" << std::endl;
 
     return results;
-}
+
