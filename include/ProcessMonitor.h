@@ -4,41 +4,29 @@
 
 #include <vector>
 #include <string>
-#include <sstream>
 
 struct activeProcesses {
     int pid;
     float cpu;
     float memory;
-    std::string elapsedTime;  // Replacing `struct time` with readable field
+    std::string elapsedTime;
     std::string user;
     std::string pathName;
-    std::vector<activeProcesses> processList; //Internal process list is missing
-
 };
 
-
-
-
-class ProcessMonitor{
+class ProcessMonitor {
 protected:
-    activeProcesses AP;
+    std::vector<activeProcesses> processList; // store all active processes
     int nbrProcess;
 
 public:
-    
     ProcessMonitor();
-
     ~ProcessMonitor();
 
     bool update();
-
-    activeProcesses getProcess(int);
-    
+    activeProcesses getProcess(int index);
     std::string getProcessInfo();
-
     std::string getProcessRaw();
-
 };
 
 #endif
