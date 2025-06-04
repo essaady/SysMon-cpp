@@ -1,15 +1,17 @@
 #pragma once
 #ifndef _CPUMONITOR_H
 #define _CPUMONITOR_H
-#include <string>
 
-typedef struct cpu{
-        float frequency;
-        float frequencyMax;
-        float usageCPU;
-        float* usagePerCPU;
-        short nbrCPU;
-    } cpu;
+#include <string>
+#include <vector>
+
+typedef struct cpu {
+    float frequency;
+    float frequencyMax;
+    float usageCPU;
+    float* usagePerCPU;
+    short nbrCPU;
+} cpu;
 
 #ifdef _WIN32
     #include <windows.h>
@@ -27,49 +29,61 @@ typedef struct cpu{
     #include <mach/mach_host.h>
 #endif
 
+// Structure commune pour les temps CPU (Linux)
+struct CpuTimes {
+    long long user = 0;
+    long long nice = 0;
+    long long system = 0;
+    long long idle = 0;
+    long long iowait = 0;
+    long long irq = 0;
+    long long softirq = 0;
+    long long steal = 0;
+    long long guest = 0;
+    long long guest_nice = 0;
+
+    long long totalIdleTime() const {
+        return idle + iowait;
+    }
+
+    long long totalTime() const {
+        return user + nice + system + idle + iowait + irq + softirq + steal + guest + guest_nice;
+    }
+};
+
 class CpuMonitor {
 protected:
     cpu CPU;
     std::string rawCPU;
 
-public:
-    // Constructeur
-    CpuMonitor();
-
-    // Destructeur
-    ~CpuMonitor();
-
-    // Méthode pour récupérer l'utilisation du CPU
-    float getCpuUsage();
-
-    // Méthode pour récupérer la fréquence actuelle du CPU
-    float getCpuFreq();
-
-    // Méthode pour récupérer des informations brutes du CPU
-    std::string getCpuInfo();
-
-    // Mettre à jour les données CPU
-    bool update();
-
-private:
 #ifdef _WIN32
     PDH_HQUERY cpuQuery;
     PDH_HCOUNTER cpuTotal;
 #elif defined(__linux__)
-    struct CpuTimes {
-        long long user, nice, system, idle, iowait, irq, softirq, steal;
-    };
-    CpuTimes lastCpuTimes;
+    CpuTimes previousTimes;
+    CpuTimes currentTimes;
     bool firstRead;
-
-    // Méthode privée pour lire les temps CPU depuis /proc/stat
-    CpuTimes readCpuTimes();
 #elif defined(__APPLE__)
     processor_info_array_t lastCpuInfo;
     mach_msg_type_number_t lastNumCpuInfo;
     natural_t lastNumCpus;
     bool firstRead;
 #endif
+
+    // Méthodes privées
+#if defined(__linux__)
+    CpuTimes readCpuTimes();
+    void updateTimes();
+#endif
+
+public:
+    CpuMonitor();
+    ~CpuMonitor();
+
+    float getCpuUsage();
+    float getCpuFreq();
+    std::string getCpuInfo();
+    bool update();
 };
 
-#endif // CPUMONITOR_H
+#endif // _CPUMONITOR_H
