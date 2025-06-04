@@ -1,67 +1,103 @@
-#include "SysMon.h"
-#include <iostream>
-#include <chrono>
-#include <csignal>
-#include <atomic>
-#include <thread>
-#include <ctime>
+
+#include "CpuMonitor.h"
+#include <fstream>
 #include <sstream>
+#include <unistd.h>
+#include <vector>
+#include <numeric>
+#include <cstring>
 
-static std::atomic<bool> keepRunning(true);
+CpuMonitor::CpuMonitor() {
+    CPU.nbrCPU = sysconf(_SC_NPROCESSORS_ONLN);
+    CPU.usagePerCPU = new float[CPU.nbrCPU];
+    for (int i = 0; i < CPU.nbrCPU; ++i) CPU.usagePerCPU[i] = 0.0f;
 
-void signalHandler(int signum) {
-    std::cout << "\n[SysMon] Arrêt demandé (signal " << signum << ").\n";
-    keepRunning = false;
+    prevIdleTimes.resize(CPU.nbrCPU, 0);
+    prevTotalTimes.resize(CPU.nbrCPU, 0);
 }
 
-SysMon::SysMon(int interval, bool log)
-    : updateInterval(interval), fullLog(log) {}
+CpuMonitor::~CpuMonitor() {
+    delete[] CPU.usagePerCPU;
+}
 
-SysMon::~SysMon() {}
+bool CpuMonitor::update() {
+    std::ifstream statFile("/proc/stat");
+    if (!statFile.is_open()) return false;
 
-int SysMon::run() {
-    std::signal(SIGINT, signalHandler);
-    std::cout << "[SysMon] Surveillance démarrée (intervalle: " << updateInterval << "s)\n";
+    rawCPU.clear();
+    std::string line;
+    int cpuIndex = 0;
 
-    while (keepRunning) {
-        if (update()) {
-            log();
-        }
-        std::this_thread::sleep_for(std::chrono::seconds(updateInterval));
+    while (std::getline(statFile, line)) {
+        rawCPU += line + "\n";
+        if (line.substr(0, 3) == "cpu") {
+            std::istringstream iss(line);
+            std::string cpuLabel;
+            unsigned long long user, nice, system, idle, iowait, irq, softirq, steal;
+
+            iss >> cpuLabel >> user >> nice >> system >> idle >> iowait >> irq >> softirq >> steal;
+
+            unsigned long long idleTime = idle + iowait;
+            unsigned long long totalTime = user + nice + system + idle + iowait + irq + softirq + steal;
+
+            if (cpuLabel != "cpu") { 
+                int idx = cpuIndex++;
+                if (idx >= CPU.nbrCPU) continue;
+
+                unsigned long long deltaIdle = idleTime - prevIdleTimes[idx];
+                unsigned long long deltaTotal = totalTime - prevTotalTimes[idx];
+
+                if (deltaTotal > 0) {
+                    CPU.usagePerCPU[idx] = 100.0f * (deltaTotal - deltaIdle) / deltaTotal;
+                }
+
+                prevIdleTimes[idx] = idleTime;
+                prevTotalTimes[idx] = totalTime;
+            } else {
+                unsigned long long deltaIdle = idleTime - prevIdleTimes[0];
+                unsigned long long deltaTotal = totalTime - prevTotalTimes[0];
+
+                if (deltaTotal > 0) {
+                    CPU.usageCPU = 100.0f * (deltaTotal - deltaIdle) / deltaTotal;
+                }
+
+                prevIdleTimes[0] = idleTime;
+                prevTotalTimes[0] = totalTime;
+            }
+        } else break;
     }
 
-    std::cout << "[SysMon] Surveillance terminée.\n";
-    return 0;
-}
+    std::ifstream cpuInfo("/proc/cpuinfo");
+    if (!cpuInfo.is_open()) return false;
 
-bool SysMon::update() {
+    std::string cpuLine;
+    while (std::getline(cpuInfo, cpuLine)) {
+        rawCPU += cpuLine + "\n";
+        if (cpuLine.find("cpu MHz") != std::string::npos) {
+            std::string freqStr = cpuLine.substr(cpuLine.find(":") + 1);
+            CPU.frequency = std::stof(freqStr);
+        } else if (cpuLine.find("model name") != std::string::npos) {
+        }
+    }
 
-    std::cout << "[SysMon] Mise à jour des données système...\n";
+    std::ifstream freqMaxFile("/sys/devices/system/cpu/cpu0/cpufreq/cpuinfo_max_freq");
+    if (freqMaxFile.is_open()) {
+        std::string val;
+        freqMaxFile >> val;
+        CPU.frequencyMax = std::stof(val) / 1000.0f; // en MHz
+    }
+
     return true;
 }
 
-std::string SysMon::getTime() {
-    auto now = std::chrono::system_clock::now();
-    std::time_t t = std::chrono::system_clock::to_time_t(now);
-    return std::ctime(&t);
+float CpuMonitor::getCpuUsage() {
+    return CPU.usageCPU;
 }
 
-std::string SysMon::getInfo(const std::string& type) {
-    return "[SysMon] Infos : " + type;
+float CpuMonitor::getCpuFreq() {
+    return CPU.frequency;
 }
 
-std::string SysMon::exportAsText() {
-    std::cout << "[SysMon] Exportation des données en format texte...\n";
-    return "export_text.txt";
-}
-
-std::string SysMon::exportAsCSV() {
-    std::cout << "[SysMon] Exportation des données au format CSV...\n";
-    return "export_data.csv";
-}
-
-void SysMon::log() {
-    if (fullLog) {
-        std::cout << "[SysMon] LOG [" << getTime() << "] : Données enregistrées.\n";
-    }
+std::string CpuMonitor::getCpuInfo() {
+    return rawCPU;
 }
