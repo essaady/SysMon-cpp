@@ -1,72 +1,59 @@
-#include "../include/MemoryMonitor.h"
 #include <iostream>
-#include <fstream> //gestion des fichiers (on utilise ifstream)
-#include <sstream> //manipuler les flux de chaines de caracteres (istringstream et ostringstream)
-#include <format> // pour std::format
+#include <thread> //pour utiliser std::this_thread::sleep_for() (mise en pause du programme)
+#include <chrono> // pour utiliser chrono dans sleep_for
+#include "../include/MemoryMonitor.h"
+#include <iomanip>  //pour setprecision et fixed, voir https://devdocs.io/cpp/io/manip/setprecision et https://devdocs.io/cpp/io/manip/fixed
 
 using namespace std;
 
-//initialisation des valeurs a 0 et mise a jour
-MemoryMonitor::MemoryMonitor() : total_memory(0), free_memory(0) {
-    update();
-}
+int main() {
+    MemoryMonitor memMonitor;
 
-bool MemoryMonitor::readMemoryInfo() {
-    ifstream meminfo("/proc/meminfo"); //ifstream pour ouvrir le fichier "/proc/meminfo" en lecture
-    if (!meminfo.is_open()) { //verifier si le fichier a bien ete ouvert
-        cout << "Erreur: Impossible d'ouvrir /proc/meminfo" << endl;
-        return false;
-    }
+    cout << "SysMon-cpp - MEMORY MONITORING" << endl;
+    cout << "------------------------------" << endl;
 
-    string line;
-    while (getline(meminfo, line)) { //lire le fichier ligne par ligne
-        istringstream iss(line); //analyser et decouper la ligne pour extraire facilement les mots (flux d'entree depuis une chaine de caracteres)
-        string key;
-        unsigned long value;
+    //configuration de la precision pour tous les nombres flottants
+    cout << fixed << setprecision(1);
+    /*
+    ou on peut utiliser aussi:
+    cout.precision(1);
+    cout<<fixed;
+    mais sans #include <iomanip>, voir https://devdocs.io/cpp/io/ios_base/precision
+    */
+    while (true) {
+        if (memMonitor.update()) {
+            //convertir ram en GB
+            const double totalRAM = memMonitor.getTotalMemory() / (1024.0 * 1024.0);
+            const double usedRAM = memMonitor.getUsedMemory() / (1024.0 * 1024.0);
+            const double freeRAM = memMonitor.getFreeMemory() / (1024.0 * 1024.0);
+            
+            //affichage de la ram
+            cout << "___RAM___" << endl;
+            cout << "Total RAM:    " << totalRAM << " GB" << endl;
+            cout << "Used RAM:  " << usedRAM << " GB / " << totalRAM << " GB" << endl;
+            cout << "Free RAM:    " << freeRAM << " GB / " << totalRAM << " GB" << endl;
+            cout << "Use:    " << memMonitor.getMemoryUsagePercentage() << "%" << endl << endl;
 
-        //lecture de la cle et de la valeur
-        iss >> key >> value; //iss lit depuis la ligne et extrait le premier mot dans key et le second (valeur numerique) dans value
+            //convertir swap en GB
+            const double totalSwap = memMonitor.getTotalSwap() / (1024.0 * 1024.0);
+            const double usedSwap = memMonitor.getUsedSwap() / (1024.0 * 1024.0);
+            const double freeSwap = memMonitor.getFreeSwap() / (1024.0 * 1024.0);
+            
+            //affichage swap
+            if (totalSwap > 0) {
+                cout << "___SWAP___" << endl;
+                cout << "Total Swap:    " << totalSwap << " GB" << endl;
+                cout << "Used Swap:  " << usedSwap << " GB / " << totalSwap << " GB" << endl;
+                cout << "Free Swap:    " << freeSwap << " GB / " << totalSwap << " GB" << endl;
+                cout << "Use:    " << memMonitor.getSwapUsagePercentage() << "%" << endl << endl;
+            }
 
-        //extraction des informations necessaires
-        if (key == "MemTotal:") {
-            total_memory = value;
-        } else if (key == "MemFree:") {
-            free_memory = value;
+        } else {
+            cout << "Erreur lors de la mise a jour des informations de memoire." << endl;
         }
-    }
 
-    meminfo.close(); //fermer le fichier quand la lecture terminee
-    return true;
-}
+        //attendre 2 secondes avant la prochaine mise a jour
+        this_thread::sleep_for(chrono::seconds(2)); //l'utilisation de la fct chrono est naicessaire, voir la documentaion de la fct std::this_thread::sleep_for en https://devdocs.io/cpp/thread/sleep_for    }
 
-bool MemoryMonitor::update() {
-    return readMemoryInfo();
-}
-
-unsigned long MemoryMonitor::getTotalMemory() const {
-    return total_memory;
-}
-
-unsigned long MemoryMonitor::getFreeMemory() const {
-    return free_memory;
-}
-
-unsigned long MemoryMonitor::getUsedMemory() const {
-    return total_memory - free_memory;
-}
-
-string MemoryMonitor::formatMemory(unsigned long memory_kb) const {
-    //convertir de KB a GB (1 GB = 1024 * 1024 KB)
-    double memory_gb = memory_kb / 1024.0 / 1024.0;
-
-    // Formatage du nombre avec une precision de 1 decimal
-    return std::format("{:.1f}", memory_gb);
-}
-
-//affichage
-void MemoryMonitor::display() const {
-    cout << "RAM Used: "
-         << formatMemory(getUsedMemory()) << " GB / "
-         << formatMemory(getTotalMemory()) << " GB"
-         << endl;
+    return 0;
 }
