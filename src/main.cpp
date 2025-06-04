@@ -21,7 +21,7 @@ int main(int argc, char* argv[]) {
             return 0;
         }
     }
-   CpuMonitor cpu;
+    CpuMonitor cpu;
     MemoryMonitor mem;
     ProcessMonitor proc;
 
