@@ -3,13 +3,14 @@
 #define _CPUMONITOR_H
 #include <string>
 
-typedef struct cpu{
-        float frequency;
-        float frequencyMax;
-        float usageCPU;
-        float* usagePerCPU;
-        short nbrCPU;
-    } cpu;
+typedef struct cpu {
+    float frequency;      // Current CPU frequency
+    float frequencyMax;   // Maximum CPU frequency
+    float usageCPU;      // Total CPU usage percentage
+    float* usagePerCPU;  // Per-core CPU usage array
+    short nbrCPU;        // Number of CPU cores
+    std::string rawCPU;  // Raw CPU information
+} cpu;
 
 // Structure to hold CPU time values read from /proc/stat
 typedef struct CpuTimes {
@@ -34,21 +35,20 @@ typedef struct CpuTimes {
 } CpuTimes;
 
 class CpuMonitor {
-
     private:
-        CpuTimes previousTimes;
-        CpuTimes currentTimes;
-          private:
-        std::string rawCPU;
-        CpuTimes readCpuTimes(); // read proc/stat
-        void updateTimes(); 
+        cpu CPU;                  // CPU metrics structure
+        CpuTimes previousTimes;   // Previous CPU time readings
+        CpuTimes currentTimes;    // Current CPU time readings
+        std::string rawCPU;       // Raw CPU information string
         
+        CpuTimes readCpuTimes(); // Read CPU times from /proc/stat
+        void updateTimes();      // Update CPU time readings
 
     public:
         CpuMonitor();
         ~CpuMonitor();
 
-        // Méthode pour récupérer l'utilisation du CPU
+        // Get current CPU usage as a percentage
         float getCpuUsage();
         
         float getCpuFreq();

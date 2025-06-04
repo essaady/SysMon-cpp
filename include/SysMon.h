@@ -24,30 +24,33 @@ enum options
 std::vector<std::string> getVector(std::istringstream &iss);
 bool isNumber(std::string &string);
 
-class SysMon : public CpuMonitor, public MemoryMonitor, public ProcessMonitor{
-protected :
-    int updateInterval;
-    bool fullLog;
+class SysMon : public CpuMonitor, public MemoryMonitor, public ProcessMonitor {
+protected:
+    int updateInterval;    // Update interval in microseconds
+    bool fullLog;         // Full logging flag
     
 public:
-
-    SysMon(int , bool fullLog=false);
-    
+    // Constructor and destructor
+    SysMon(int interval, bool fullLog=false);
     ~SysMon();
 
+    // Core functionality
     int run(int limit=3);
+    bool update();
 
+    // Export functionality
     string exportAsText();
-
     string exportAsCSV();
 
-    bool update();
-    
+    // Utility functions
     string getTime();
+    static string getInfo(string filePath);
+    static void log(ostream& out);
 
-    static string getInfo(string _file_path);
-
-    static void log(ostream &);
+private:
+    // Helper functions
+    string formatOutput() const;
+    void initializeMonitors();
 
 };
 #endif

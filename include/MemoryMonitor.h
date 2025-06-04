@@ -5,13 +5,14 @@
 #include <string>
 #include <vector>
 
-typedef struct ram{
-    float usage;
-    float freeMem;
-    float usageSwp;
-    float freeSwp;
-    std::size_t totalMemInMb;
-    std::size_t SwapMeminMb;
+typedef struct ram {
+    size_t totalMemInMb;    // Total RAM in MB
+    float usage;            // Current RAM usage
+    float freeMem;          // Free RAM
+    size_t SwapMemInMb;     // Total swap memory in MB
+    float usageSwp;         // Swap usage
+    float freeSwp;          // Free swap space
+    std::vector<std::string> memInfo;  // Memory information details
 } ram;
 
 class MemoryMonitor {
