@@ -51,5 +51,24 @@ std::string ProcessMonitor::getProcessRaw()
 bool ProcessMonitor::update(){
     //To-Do
     getProcessRaw();
+    apList.clear();  
+    nbrProcess = 0;
     return true;
+}
+
+AP ProcessMonitor::getProcess(int index) const {
+    if (index >= 0 && index < static_cast<int>(apList.size())) {
+        return apList[index];
+    }
+    throw std::out_of_range("Index hors limites !");
+}
+
+std::string ProcessMonitor::getProcessInfo() const {
+    std::ostringstream oss;
+    oss << "\x1b[42m Name       PID        \x1b[0m\n";
+    for (const auto& proc : apList) {
+        oss << proc.name << "    " << proc.pid << "\n";
+    }
+    oss << "There are : " << nbrProcess << " processes\n";
+    return oss.str();
 }
