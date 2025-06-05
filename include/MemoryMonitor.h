@@ -26,62 +26,23 @@ public:
     // -------------------------------
     // Méthode principale: update()
     // -------------------------------
-    bool update() {
-        ifstream memFile("/proc/meminfo");
-        if (!memFile.is_open()) return false;
-
-        string line;
-        ram.memInfo.clear();
-
-        while (getline(memFile, line)) {
-            ram.memInfo.push_back(line);
-        }
-        memFile.close();
-
-        for (const auto& entry : ram.memInfo) {
-            istringstream iss(entry);
-            string key;
-            size_t value;
-            string unit;
-
-            iss >> key >> value >> unit;
-
-            if (key == "MemTotal:") totalMemMb = value / 1024;
-            else if (key == "MemFree:") freeMem = value / 1024.0;
-            else if (key == "SwapTotal:") SwapMemMb = value / 1024;
-            else if (key == "SwapFree:") freeSwap = value / 1024.0;
-        }
-
-        return true;
-    }
+    bool update();
 
     // -------------------------------
     // Méthodes d'accès
     // -------------------------------
-    unsigned long long getTotalMemory() const {
-        return totalMemMb;
-    }
+    unsigned long long getTotalMemory() const;
+    unsigned long long getFreeMemory() const;
+    unsigned long long getTotalSwap() const;
+    unsigned long long getUsedSwap() const;
+    double getMemoryUsagePercentage() const;
+    double getSwapUsagePercentage() const;
 
-    unsigned long long getFreeMemory() const {
-        return static_cast<unsigned long long>(freeMem);
-    }
-
-    unsigned long long getTotalSwap() const {
-        return SwapMemMb;
-    }
-
-    unsigned long long getUsedSwap() const {
-        return static_cast<unsigned long long>(SwapMemMb - freeSwap);
-    }
-
-    double getMemoryUsagePercentage() const {
-        return ((totalMemMb - freeMem) / totalMemMb) * 100.0;
-    }
-
-    double getSwapUsagePercentage() const {
-        if (SwapMemMb == 0) return 0.0;
-        return ((SwapMemMb - freeSwap) / SwapMemMb) * 100.0;
-    }
+    // -------------------------------
+    // Nouvelle méthode : Utilisation du disque
+    // -------------------------------
+    void afficherUtilisationDisque(const std::string& chemin = "/");
 };
 
 #endif
+
