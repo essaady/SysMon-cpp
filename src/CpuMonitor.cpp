@@ -1,8 +1,6 @@
 #include "../include/CpuMonitor.h"
 
 #include <iostream>
-#include <thread>
-#include <chrono>
 #include <unistd.h>
 #include <bits/ostream.tcc>
 using namespace std;
