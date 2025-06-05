@@ -1,139 +1,153 @@
+/*
+ * ProcessMonitor.cpp 
+    *PROJET : Surveiller les processus système
+*CNE:D131430374    
+ * NOM ET PRENOM : HASSAN BEN BIROUK
+ * Date : *1/6/2025
+ * Description : Ce module permet de surveiller l'activité des processus,
+ *               leur consommation de ressources et d'effectuer des actions
+ */
 #include "ProcessMonitor.h"
-#include <iostream>
-#include <vector>
-#include <chrono>
-#include <thread>
-#include <stdexcept>
+#include <fstream>
+#include <sstream>
+#include <algorithm>
+#include <iomanip>
 
 using namespace std;
 
-constexpr unsigned int DEFAULT_CHECK_INTERVAL = 2000;
+ProcessMonitor::ProcessMonitor() : m_updateInterval(2) {}
 
-ProcessMonitor::ProcessMonitor() 
-    : m_isRunning(false), 
-      m_checkInterval(DEFAULT_CHECK_INTERVAL),
-      m_maxCpuUsage(90.0),
-      m_maxMemoryUsage(80.0)
-{
-    initializeSystemResources();
-}
-
-ProcessMonitor::~ProcessMonitor()
-{
-    if (m_isRunning) {
-        stopMonitoring();
+void ProcessMonitor::setUpdateInterval(int seconds) {
+    if(seconds <= 0) {
+        throw invalid_argument("L'intervalle doit être positif");
     }
-    cleanupSystemResources();
+    m_updateInterval = seconds;
 }
 
-bool ProcessMonitor::startMonitoring()
-{
-    if (m_isRunning) {
-        cerr << "La surveillance est déjà en cours." << endl;
-        return false;
-    }
-
-    m_isRunning = true;
-    m_monitorThread = thread(&ProcessMonitor::monitorLoop, this);
-    
-    cout << "Début de la surveillance des processus..." << endl;
-    return true;
-}
-
-void ProcessMonitor::stopMonitoring()
-{
-    if (!m_isRunning) {
-        return;
-    }
-
-    m_isRunning = false;
-    if (m_monitorThread.joinable()) {
-        m_monitorThread.join();
-    }
-
-    cout << "Surveillance des processus arrêtée." << endl;
-}
-
-void ProcessMonitor::setCheckInterval(unsigned int milliseconds)
-{
-    if (milliseconds < 100) {
-        throw invalid_argument("L'intervalle doit être d'au moins 100ms");
-    }
-    m_checkInterval = milliseconds;
-}
-
-void ProcessMonitor::setResourceLimits(double maxCpu, double maxMemory)
-{
-    if (maxCpu <= 0 || maxCpu > 100 || maxMemory <= 0 || maxMemory > 100) {
-        throw invalid_argument("Les limites doivent être entre 0 et 100");
-    }
-    
-    m_maxCpuUsage = maxCpu;
-    m_maxMemoryUsage = maxMemory;
-    
-    cout << "Nouvelles limites définies - CPU: " << maxCpu 
-              << "%, Mémoire: " << maxMemory << "%" << endl;
-}
-
-void ProcessMonitor::monitorLoop()
-{
-    while (m_isRunning) {
-        vector<ProcessInfo> processes = getRunningProcesses();
-        
-        for (const auto& process : processes) {
-            checkProcessResources(process);
-        }
-        
-        this_thread::sleep_for(chrono::milliseconds(m_checkInterval));
-    }
-}
-
-void ProcessMonitor::checkProcessResources(const ProcessInfo& process)
-{
-    if (process.cpuUsage > m_maxCpuUsage) {
-        handleHighCpuUsage(process);
-    }
-    
-    if (process.memoryUsage > m_maxMemoryUsage) {
-        handleHighMemoryUsage(process);
-    }
-}
-
-void ProcessMonitor::handleHighCpuUsage(const ProcessInfo& process)
-{
-    cerr << "Alerte! Processus " << process.name 
-              << " (PID: " << process.pid << ") utilise " 
-              << process.cpuUsage << "% de CPU (limite: " 
-              << m_maxCpuUsage << "%)" << endl;
-}
-
-void ProcessMonitor::handleHighMemoryUsage(const ProcessInfo& process)
-{
-    cerr << "Alerte! Processus " << process.name 
-              << " (PID: " << process.pid << ") utilise " 
-              << process.memoryUsage << "% de mémoire (limite: " 
-              << m_maxMemoryUsage << "%)" << endl;
-}
-
-void ProcessMonitor::initializeSystemResources()
-{
-}
-
-void ProcessMonitor::cleanupSystemResources()
-{
-}
-
-vector<ProcessInfo> ProcessMonitor::getRunningProcesses()
-{
+vector<ProcessInfo> ProcessMonitor::getRunningProcesses() {
     vector<ProcessInfo> processes;
-    
-    ProcessInfo p1;
-    p1.pid = 1234;
-    p1.name = "example_process";
-    p1.cpuUsage = 25.5;
-    p1.memoryUsage = 12.3;
-    
-    processes.push_back(p1);
-    
+    vector<pid_t> pids = getAllPids();
+
+    for(const auto& pid : pids) {
+        try {
+            ProcessInfo info = getProcessInfo(pid);
+            processes.push_back(info);
+        } catch(const exception& e) {
+            cerr << "Erreur lecture PID " << pid << ": " << e.what() << endl;
+        }
+    }
+
+    sort(processes.begin(), processes.end(), 
+        [](const ProcessInfo& a, const ProcessInfo& b) {
+            return a.cpuUsage > b.cpuUsage;
+        });
+
     return processes;
+}
+
+vector<pid_t> ProcessMonitor::getAllPids() {
+    vector<pid_t> pids;
+    DIR* dir = opendir("/proc");
+    
+    if(!dir) {
+        throw runtime_error("Impossible d'ouvrir /proc");
+    }
+
+    struct dirent* entry;
+    while((entry = readdir(dir)) != nullptr) {
+        if(entry->d_type == DT_DIR) {
+            string name(entry->d_name);
+            if(all_of(name.begin(), name.end(), ::isdigit)) {
+                pids.push_back(stoi(name));
+            }
+        }
+    }
+    closedir(dir);
+    return pids;
+}
+
+ProcessInfo ProcessMonitor::getProcessInfo(pid_t pid) {
+    ProcessInfo info;
+    info.pid = pid;
+    
+    string statPath = "/proc/" + to_string(pid) + "/stat";
+    ifstream statFile(statPath);
+    if(!statFile) {
+        throw runtime_error("Fichier stat inaccessible");
+    }
+
+    string line;
+    getline(statFile, line);
+    istringstream iss(line);
+    
+    string ignore;
+    iss >> ignore >> info.name;
+    info.name = info.name.substr(1, info.name.size() - 2);
+    
+    for(int i = 3; i <= 22; ++i) iss >> ignore;
+    iss >> info.utime >> info.stime;
+    
+    statFile.close();
+
+    string statusPath = "/proc/" + to_string(pid) + "/status";
+    ifstream statusFile(statusPath);
+    if(statusFile) {
+        while(getline(statusFile, line)) {
+            if(line.find("VmRSS:") == 0) {
+                istringstream(line.substr(6)) >> info.memoryUsage;
+                info.memoryUsage /= 1024; // Convertir en Mo
+            }
+        }
+    }
+
+    calculateCpuUsage(info);
+    return info;
+}
+
+void ProcessMonitor::calculateCpuUsage(ProcessInfo& info) {
+    static map<pid_t, pair<unsigned long, unsigned long>> prevTimes;
+    
+    unsigned long total_time = info.utime + info.stime;
+    auto it = prevTimes.find(info.pid);
+    
+    if(it != prevTimes.end()) {
+        unsigned long prev_total = it->second.first + it->second.second;
+        unsigned long time_diff = total_time - prev_total;
+        info.cpuUsage = (time_diff * 100.0) / (m_updateInterval * sysconf(_SC_CLK_TCK));
+    }
+    
+    prevTimes[info.pid] = {info.utime, info.stime};
+}
+
+void ProcessMonitor::exportToCSV(const string& filename) {
+    ofstream outfile(filename);
+    if(!outfile) {
+        throw runtime_error("Impossible d'ouvrir le fichier CSV");
+    }
+
+    outfile << "PID,Nom,CPU%,Mémoire(Mo)\n";
+    auto processes = getRunningProcesses();
+    
+    for(const auto& proc : processes) {
+        outfile << proc.pid << ","
+                << proc.name << ","
+                << fixed << setprecision(1) << proc.cpuUsage << ","
+                << proc.memoryUsage << "\n";
+    }
+}
+
+void ProcessMonitor::displayProcesses() const {
+    cout << left << setw(8) << "PID" 
+         << setw(20) << "Nom" 
+         << setw(10) << "CPU%" 
+         << setw(15) << "Mémoire(Mo)" 
+         << endl;
+
+    for(const auto& proc : m_processes) {
+        cout << setw(8) << proc.pid
+             << setw(20) << (proc.name.length() > 19 ? proc.name.substr(0, 17) + ".." : proc.name)
+             << setw(10) << fixed << setprecision(1) << proc.cpuUsage
+             << setw(15) << proc.memoryUsage
+             << endl;
+    }
 }
