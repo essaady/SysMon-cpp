@@ -45,3 +45,11 @@ bool MemoryMonitor::update(){
     memUsage(0);
     return true;
 }
+
+unsigned long long MemoryMonitor::getTotalMemory() const{
+    return RAM.totalMemInMb;
+}
+
+unsigned long long MemoryMonitor::getUsedMemory() const{
+    return RAM.usage;
+}
