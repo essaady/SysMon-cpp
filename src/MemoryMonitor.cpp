@@ -85,3 +85,10 @@ unsigned long long getUsedMemory() {
     long used_memory = mem_total - mem_free - buffers - cached;
     return static_cast<float>(used_memory) / 1024; // Conversion en Mo
 }
+unsigned long long MemoryMonitor::getTotalMemory() const{
+    return RAM.totalMemInMb;
+}
+
+unsigned long long MemoryMonitor::getUsedMemory() const{
+    return RAM.usage;
+}
