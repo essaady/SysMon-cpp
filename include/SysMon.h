@@ -50,4 +50,7 @@ public:
     static void log(ostream &);
 
 };
+
+
 #endif
+
