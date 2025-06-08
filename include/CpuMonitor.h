@@ -2,6 +2,7 @@
 #ifndef _CPUMONITOR_H
 #define _CPUMONITOR_H
 #include <string>
+#include <cstdint>
 
 typedef struct cpu{
         float frequency;
@@ -46,6 +47,7 @@ class CpuMonitor {
         std::string rawCPU;
         CpuTimes readCpuTimes(); // read proc/stat
         void updateTimes(); 
+        uint64_t getSnap(std::string calc);
         
 
     public:
@@ -63,6 +65,8 @@ class CpuMonitor {
         std::string getCpuInfo();
 
         bool update();
+
+        float calcCpuUsage(int log, int updateInterval=5e5);
 };
 
 #endif 

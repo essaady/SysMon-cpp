@@ -43,7 +43,7 @@ public:
 
     bool update();
     
-    string getTime();
+    static string getTime();
 
     static string getInfo(string _file_path);
 

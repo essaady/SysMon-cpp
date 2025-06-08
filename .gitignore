@@ -37,5 +37,10 @@
 # Swap files
 *.swp
 
-# Vscode
+#temporary files
+.tmp
+
+# folders
 .vscode/
+build/
+CMakeLists.txt
