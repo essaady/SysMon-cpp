@@ -1,8 +1,4 @@
-#include "../include/MemoryMonitor.h"
-#include "../include/CpuMonitor.h"
-#include "../include/ProcessMonitor.h"
-
-
+#include "../include/SysMon.h"
 
 int main(int argc, char *argv[])
 {
@@ -43,25 +39,10 @@ int main(int argc, char *argv[])
         
     }
 
-    CpuMon cpu;
-    MemInfo mem;
-    ProcMon process;
-    // Calculating and printing both cpu and memory usage
-    int i = 0;
-    while (i < 10)
-    {
-        system("clear");
-        cpu.calcCpuUsage(option);
-        mem.memUsage(option);
-        process.getProcess();
-        i++;
-        usleep(500000);
-    }
-
     int updateInterval = 5e5;
     
     SysMon SysMonCpp(updateInterval);
 
     
-    return 0;
+    return SysMonCpp.run();
 }

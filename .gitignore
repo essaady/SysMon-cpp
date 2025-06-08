@@ -44,9 +44,3 @@
 .vscode/
 build/
 CMakeLists.txt
-
-# Text files
-*.txt
-
-# Swap files
-*.swp

@@ -1,12 +1,54 @@
 #include "../include/CpuMonitor.h"
+#include "../include/SysMon.h"
+#include <unistd.h>
+#include <cstdint>
+
+using namespace std;
+
+// Constructeur
+CpuMonitor::CpuMonitor() {
+    // Initialisation des ressources si nécessaire
+    CPU.frequencyMax = 0; //To-Do 
+    CPU.nbrCPU = 0;  //To-Do
+}
+
+// Méthode pour récupérer l'utilisation du CPU (sera implémentée plus tard)
+float CpuMonitor::getCpuUsage() {
+    // Retourner une valeur factice pour l'instant (par exemple, 0.0)
+    //To-Do
+    return 0.0;
+}
+
+// Destructeur
+CpuMonitor::~CpuMonitor() {
+    // Libération des ressources si nécessaire
+
+}
+
+bool CpuMonitor::update(){
+    //To-Do
+    // CPU.usageCPU  = getCpuUsage(); 
+    // CPU.frequency = getCpuFreq(); 
+    // rawCPU = getCpuInfo();
+    return true;
+}
+
+float CpuMonitor::getCpuFreq(){
+    //To-Do
+    return 0.0;
+}
+
+std::string CpuMonitor::getCpuInfo(){
+    //To-Do
+    return "";
+}
 
 // Getting cpu. snap in snapshot
-uint64_t CpuMon::getSnap(std::string calc)
-{
+uint64_t CpuMonitor::getSnap(std::string calc){
 
     uint64_t cpu;
 
-    std::string temp = getInfo("/proc/stat");
+    std::string temp = SysMon::getInfo("/proc/stat");
     std::istringstream iss(temp);
     iss >> temp;
     uint64_t value;
@@ -31,11 +73,11 @@ uint64_t CpuMon::getSnap(std::string calc)
     return cpu;
 }
 
-float CpuMon::calcCpuUsage(int logger)
+float CpuMonitor::calcCpuUsage(int logger,int updateInterval)
 {
     uint64_t cpu1 = getSnap("NULL");
     uint64_t notIdle1 = getSnap("_USED");
-    usleep(500000);
+    usleep(updateInterval);
     uint64_t cpu2 = getSnap("NULL");
     uint64_t notIdle2 = getSnap("_USED");
 
@@ -50,9 +92,9 @@ float CpuMon::calcCpuUsage(int logger)
     if (logger == options::_NLOG)
     {
         std::stringstream out;
-        out << getTime() << "    UsedTime : " << UsedTime << " TotalTime : " << TotalTime << " CpuUsage: " << results << "%\n";
+        out << SysMon::getTime() << "    UsedTime : " << UsedTime << " TotalTime : " << TotalTime << " CpuUsage: " << results << "%\n";
 
-        log(out);
+        SysMon::log(out);
     }
     return results;
 }
